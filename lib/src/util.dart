@@ -6,3 +6,7 @@ String timestamp(DateTime dateTime) {
   final minute = dateTime.minute.toString().padLeft(2, '0');
   return '$hour:$minute';
 }
+
+/// Returns valid headers for Three Rings.
+Map<String, String> getHeaders({required String apiKey}) =>
+    {'AUTHORIZATION': 'APIKEY $apiKey'};

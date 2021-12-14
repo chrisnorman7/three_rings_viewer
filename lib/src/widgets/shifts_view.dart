@@ -8,10 +8,14 @@ import 'shift_volunteers_view.dart';
 /// A widget that shows a list of [Shift] instances.
 class ShiftsView extends StatefulWidget {
   /// Create an instance.
-  const ShiftsView({required this.shifts, Key? key}) : super(key: key);
+  const ShiftsView({required this.shifts, required this.apiKey, Key? key})
+      : super(key: key);
 
   /// The shifts to show.
   final List<Shift> shifts;
+
+  /// The API key key to pass to [ShiftVolunteersView].
+  final String apiKey;
 
   /// Create state for this widget.
   @override
@@ -34,11 +38,13 @@ class _ShiftsViewState extends State<ShiftsView> {
           onTap: () =>
               Navigator.of(context).push<ShiftVolunteersView>(MaterialPageRoute(
             builder: (context) => ShiftVolunteersView(
-                title: shift.title,
-                volunteers: [
-                  for (final volunteerShift in shift.volunteerShifts)
-                    volunteerShift.volunteer
-                ]),
+              title: shift.title,
+              volunteers: [
+                for (final volunteerShift in shift.volunteerShifts)
+                  volunteerShift.volunteer
+              ],
+              apiKey: widget.apiKey,
+            ),
           )),
         );
       },

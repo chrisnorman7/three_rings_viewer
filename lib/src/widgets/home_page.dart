@@ -6,6 +6,7 @@ import '../enumerations.dart';
 import '../json/preferences.dart';
 import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
+import '../util.dart';
 import 'api_key_form.dart';
 import 'get_url_widget.dart';
 import 'shifts_view.dart';
@@ -52,15 +53,14 @@ class _HomePageState extends State<HomePage> {
                 Preferences.fromSharedPreferences(snapshot.requireData);
             final Widget child;
             final String title;
-            if (preferences.apiKey == null) {
+            final apiKey = preferences.apiKey;
+            if (apiKey == null) {
               title = 'Error';
               child = const Center(
                 child: Text('You must first add your API key.'),
               );
             } else {
-              final options = BaseOptions(headers: <String, String>{
-                'Authorization': 'APIKEY ${preferences.apiKey}'
-              });
+              final options = BaseOptions(headers: getHeaders(apiKey: apiKey));
               final http = Dio(options);
               switch (_states) {
                 case HomePageStates.shifts:
@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
                         final shiftList = ShiftList.fromJson(json);
                         return ShiftsView(
                           shifts: shiftList.shifts,
+                          apiKey: apiKey,
                         );
                       }
                     },
@@ -108,7 +109,7 @@ class _HomePageState extends State<HomePage> {
             }
             return Scaffold(
               appBar: AppBar(
-                title: Text(title),
+                title: Semantics(liveRegion: true, child: Text(title)),
                 leading: ElevatedButton(
                   onPressed: () => Navigator.of(context).pushReplacementNamed(
                       ApiKeyForm.routeName,
