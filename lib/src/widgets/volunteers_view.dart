@@ -26,24 +26,31 @@ class VolunteersView extends StatefulWidget {
 class _VolunteersViewState extends State<VolunteersView> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) => ListView.builder(
-        itemBuilder: (context, index) {
-          final volunteer = widget.volunteers[index];
-          return ListTile(
-            title: Text(volunteer.name),
-            subtitle: Image.network(
-              volunteer.imageUrl,
-              headers: getHeaders(apiKey: widget.apiKey),
-            ),
-            onTap: () =>
-                Navigator.of(context).push(MaterialPageRoute<VolunteerView>(
-              builder: (context) => VolunteerView(
-                volunteer: volunteer,
-                apiKey: widget.apiKey,
+  Widget build(BuildContext context) => OrientationBuilder(
+        builder: (context, orientation) => GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: orientation == Orientation.portrait ? 4 : 5),
+          itemBuilder: (context, index) {
+            final volunteer = widget.volunteers[index];
+            return IconButton(
+              onPressed: () =>
+                  Navigator.of(context).push(MaterialPageRoute<VolunteerView>(
+                builder: (context) =>
+                    VolunteerView(volunteer: volunteer, apiKey: widget.apiKey),
+              )),
+              icon: Column(
+                children: [
+                  Image.network(
+                    volunteer.imageUrl,
+                    headers: getHeaders(apiKey: widget.apiKey),
+                    semanticLabel: volunteer.name,
+                  ),
+                  Text(volunteer.name)
+                ],
               ),
-            )),
-          );
-        },
-        itemCount: widget.volunteers.length,
+            );
+          },
+          itemCount: widget.volunteers.length,
+        ),
       );
 }
