@@ -37,7 +37,10 @@ class _VolunteersViewState extends State<VolunteersView> {
             ),
             onTap: () =>
                 Navigator.of(context).push(MaterialPageRoute<VolunteerView>(
-              builder: (context) => VolunteerView(volunteer: volunteer),
+              builder: (context) => VolunteerView(
+                volunteer: volunteer,
+                apiKey: widget.apiKey,
+              ),
             )),
           );
         },
