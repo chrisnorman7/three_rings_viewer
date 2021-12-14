@@ -138,6 +138,16 @@ class _VolunteerViewState extends State<VolunteerView> {
                 subtitle: Text(widget.volunteer.creator.name),
               ),
             ),
+            Focus(
+                child: ListTile(
+              title: const Text('Updated At'),
+              subtitle: Text(prettyDate(widget.volunteer.updatedAt)),
+            )),
+            Focus(
+                child: ListTile(
+              title: const Text('Updated By'),
+              subtitle: Text(widget.volunteer.updater.name),
+            )),
             ListTile(
               title: const Text('Roles'),
               subtitle: Text(widget.volunteer.roles.length.toString()),
