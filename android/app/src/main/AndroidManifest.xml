@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.metropolis.three_rings_viewer">
    <application
-        android:label="three_rings_viewer"
+        android:label="Three Rings Viewer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
