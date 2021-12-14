@@ -22,6 +22,9 @@ enum VolunteerViewStates {
   /// Show a full screen image of the volunteer.
   image,
 
+  /// List of volunteer roles.
+  roles,
+
   /// More.
   more,
 }

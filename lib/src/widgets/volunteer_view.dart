@@ -8,7 +8,6 @@ import '../enumerations.dart';
 import '../json/directory_volunteer.dart';
 import '../util.dart';
 import 'cancellable_widget.dart';
-import 'volunteer_roles_view.dart';
 
 /// A widget to show volunteer details.
 class VolunteerView extends StatefulWidget {
@@ -123,6 +122,16 @@ class _VolunteerViewState extends State<VolunteerView> {
           width: double.infinity,
         );
         break;
+      case VolunteerViewStates.roles:
+        child = ListView.builder(
+          itemBuilder: (context, index) => Focus(
+            child: ListTile(
+              title: Text(widget.volunteer.roles[index].name),
+            ),
+          ),
+          itemCount: widget.volunteer.roles.length,
+        );
+        break;
       case VolunteerViewStates.more:
         child = ListView(
           children: [
@@ -148,15 +157,6 @@ class _VolunteerViewState extends State<VolunteerView> {
               title: const Text('Updated By'),
               subtitle: Text(widget.volunteer.updater.name),
             )),
-            ListTile(
-              title: const Text('Roles'),
-              subtitle: Text(widget.volunteer.roles.length.toString()),
-              onTap: () => Navigator.of(context)
-                  .push<VolunteerRolesView>(MaterialPageRoute(
-                builder: (context) =>
-                    VolunteerRolesView(volunteer: widget.volunteer),
-              )),
-            )
           ],
         );
         break;
@@ -177,6 +177,8 @@ class _VolunteerViewState extends State<VolunteerView> {
                   headers: getHeaders(apiKey: widget.apiKey),
                 ),
                 label: 'Image'),
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
             const BottomNavigationBarItem(
                 icon: Icon(Icons.more_rounded), label: 'More')
           ],
