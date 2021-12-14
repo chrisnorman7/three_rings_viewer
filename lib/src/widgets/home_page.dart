@@ -131,10 +131,12 @@ class _HomePageState extends State<HomePage> {
                       icon: Icon(Icons.info_rounded), label: 'News')
                 ],
                 currentIndex: _states.index,
-                onTap: (value) => setState(() {
-                  _states = HomePageStates.values
-                      .firstWhere((element) => element.index == value);
-                }),
+                onTap: preferences.apiKey == null
+                    ? null
+                    : (value) => setState(() {
+                          _states = HomePageStates.values
+                              .firstWhere((element) => element.index == value);
+                        }),
               ),
             );
           } else {
