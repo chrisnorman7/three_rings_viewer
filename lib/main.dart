@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'src/widgets/api_key_form.dart';
 import 'src/widgets/home_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 /// The main app class.
 class MyApp extends StatelessWidget {

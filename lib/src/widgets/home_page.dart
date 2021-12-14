@@ -96,20 +96,22 @@ class _HomePageState extends State<HomePage> {
                       } else {
                         final volunteers = VolunteerList.fromJson(json);
                         return VolunteersView(
-                            volunteers: volunteers.volunteers ?? []);
+                          volunteers: volunteers.volunteers ?? [],
+                          apiKey: apiKey,
+                        );
                       }
                     },
                   );
                   break;
                 case HomePageStates.news:
                   title = 'News';
-                  child = const Text('News');
+                  child = const Focus(child: Text('News'));
                   break;
               }
             }
             return Scaffold(
               appBar: AppBar(
-                title: Semantics(liveRegion: true, child: Text(title)),
+                title: Text(title),
                 leading: ElevatedButton(
                   onPressed: () => Navigator.of(context).pushReplacementNamed(
                       ApiKeyForm.routeName,

@@ -48,7 +48,9 @@ class _GetUrlWidgetState extends State<GetUrlWidget> {
             );
           } else {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Loading...',
+              ),
             );
           }
         },
