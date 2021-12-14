@@ -114,9 +114,10 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () => Navigator.of(context).pushReplacementNamed(
                       ApiKeyForm.routeName,
                       arguments: preferences),
-                  child: const Icon(
+                  child: Icon(
                     Icons.settings,
-                    semanticLabel: 'Enter API key',
+                    semanticLabel:
+                        '${apiKey == null ? "Enter" : "Change"} API key',
                   ),
                 ),
               ),
