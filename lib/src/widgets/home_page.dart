@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../enumerations.dart';
 import '../json/preferences.dart';
+import '../json/shift.dart';
 import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
 import '../util.dart';
@@ -81,11 +82,12 @@ class _HomePageState extends State<HomePage> {
                   ];
                   final endDate = stuff.join('-');
                   final future = http.get<JsonType>(
-                      'https://www.3r.org.uk/shift.json',
-                      queryParameters: <String, dynamic>{
-                        'start_date': startDate,
-                        'end_date': endDate
-                      });
+                    'https://www.3r.org.uk/shift.json',
+                    queryParameters: <String, dynamic>{
+                      'start_date': startDate,
+                      'end_date': endDate
+                    },
+                  );
                   child = GetUrlWidget(
                     future: future,
                     onLoad: (json) {
@@ -93,8 +95,47 @@ class _HomePageState extends State<HomePage> {
                         return const Center(child: Text('No shifts to show.'));
                       } else {
                         final shiftList = ShiftList.fromJson(json);
+                        final possibleShifts = shiftList.shifts
+                          ..sort((a, b) {
+                            final result = a.start.compareTo(b.start);
+                            if (result == 0) {
+                              if (a.rota.name.startsWith('Leader')) {
+                                return -1;
+                              }
+                              return b.rota.name.compareTo(a.rota.name);
+                            }
+                            return result;
+                          });
+                        final now = DateTime.now();
+                        final shifts = <Shift>[];
+                        DateTime? previousStartTime;
+                        DateTime? nextStartTime;
+                        for (final shift in possibleShifts) {
+                          if ((previousStartTime == null ||
+                                  shift.start.isAfter(previousStartTime)) &&
+                              shift.end.isBefore(now)) {
+                            previousStartTime = shift.start;
+                          } else if ((nextStartTime == null ||
+                                  shift.start.isBefore(nextStartTime)) &&
+                              shift.start.isAfter(now)) {
+                            nextStartTime = shift.start;
+                          }
+                        }
+                        if (previousStartTime != null) {
+                          shifts.addAll(possibleShifts.where((element) =>
+                              element.start
+                                  .isAtSameMomentAs(previousStartTime!) &&
+                              element.end.isBefore(now)));
+                        }
+                        shifts.addAll(possibleShifts.where((element) =>
+                            element.start.isBefore(now) &&
+                            element.end.isAfter(now)));
+                        if (nextStartTime != null) {
+                          shifts.addAll(possibleShifts.where((element) =>
+                              element.start.isAtSameMomentAs(nextStartTime!)));
+                        }
                         return ShiftsView(
-                          shifts: shiftList.shifts,
+                          shifts: shifts,
                           apiKey: apiKey,
                         );
                       }

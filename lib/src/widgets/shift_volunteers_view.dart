@@ -5,6 +5,7 @@ import '../json/loaded_volunteer.dart';
 import '../json/shift_volunteer.dart';
 import '../util.dart';
 import 'cancellable_widget.dart';
+import 'get_url_widget.dart';
 import 'home_page.dart';
 import 'volunteer_view.dart';
 
@@ -50,17 +51,32 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
                   volunteer.imageUrl,
                   headers: getHeaders(apiKey: widget.apiKey),
                 ),
-                onTap: () async {
+                onTap: () {
                   final http = Dio(
                       BaseOptions(headers: getHeaders(apiKey: widget.apiKey)));
-                  final response = await http.get<JsonType>(
+                  final future = http.get<JsonType>(
                       'https://www.3r.org.uk/directory/${volunteer.id}?format=json');
-                  final json = response.data!;
-                  final loadedVolunteer = LoadedVolunteer.fromJson(json);
-                  Navigator.of(context).push(MaterialPageRoute<VolunteerView>(
-                    builder: (context) => VolunteerView(
-                        volunteer: loadedVolunteer.volunteer,
-                        apiKey: widget.apiKey),
+                  Navigator.of(context).push(MaterialPageRoute<GetUrlWidget>(
+                    builder: (context) => GetUrlWidget(
+                      future: future,
+                      onLoad: (json) {
+                        if (json == null) {
+                          return Scaffold(
+                            appBar: AppBar(
+                              title: const Text('Error'),
+                            ),
+                            body: const Center(
+                              child: Text('Failed to load volunteer.'),
+                            ),
+                          );
+                        } else {
+                          final volunteer =
+                              LoadedVolunteer.fromJson(json).volunteer;
+                          return VolunteerView(
+                              volunteer: volunteer, apiKey: widget.apiKey);
+                        }
+                      },
+                    ),
                   ));
                 },
               );
