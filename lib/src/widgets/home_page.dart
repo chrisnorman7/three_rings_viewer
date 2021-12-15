@@ -65,8 +65,27 @@ class _HomePageState extends State<HomePage> {
               switch (_states) {
                 case HomePageStates.shifts:
                   title = 'Shifts';
-                  final future =
-                      http.get<JsonType>('https://www.3r.org.uk/shift.json');
+                  final today = DateTime.now();
+                  final yesterday = today.subtract(const Duration(days: 1));
+                  final tomorrow = today.add(const Duration(days: 1));
+                  var stuff = [
+                    yesterday.year,
+                    padNumber(yesterday.month),
+                    padNumber(yesterday.day)
+                  ];
+                  final startDate = stuff.join('-');
+                  stuff = [
+                    tomorrow.year,
+                    padNumber(tomorrow.month),
+                    padNumber(tomorrow.day)
+                  ];
+                  final endDate = stuff.join('-');
+                  final future = http.get<JsonType>(
+                      'https://www.3r.org.uk/shift.json',
+                      queryParameters: <String, dynamic>{
+                        'start_date': startDate,
+                        'end_date': endDate
+                      });
                   child = GetUrlWidget(
                     future: future,
                     onLoad: (json) {

@@ -27,3 +27,6 @@ String prettyDate(DateTime dateTime) {
     ..write(dateTime.second.toString().padLeft(2, '0'));
   return stringBuffer.toString();
 }
+
+/// Return a number padded with 0's.
+String padNumber(int n) => n.toString().padLeft(2, '0');
