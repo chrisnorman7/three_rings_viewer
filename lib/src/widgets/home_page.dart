@@ -191,15 +191,15 @@ class _HomePageState extends State<HomePage> {
                 return ShiftsView(
                   shifts:
                       getShifts(preferences: preferences, shiftList: shiftList),
-                  apiKey: apiKey,
+                  preferences: preferences,
                 );
               },
             );
           } else {
             child = ShiftsView(
-                shifts:
-                    getShifts(preferences: preferences, shiftList: shiftList),
-                apiKey: apiKey);
+              shifts: getShifts(preferences: preferences, shiftList: shiftList),
+              preferences: preferences,
+            );
           }
           break;
         case HomePageStates.volunteers:

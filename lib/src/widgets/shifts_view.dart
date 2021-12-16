@@ -1,6 +1,7 @@
 /// Provides the [ShiftsView] class.
 import 'package:flutter/material.dart';
 
+import '../json/preferences.dart';
 import '../json/shift.dart';
 import '../util.dart';
 import 'shift_volunteers_view.dart';
@@ -8,14 +9,14 @@ import 'shift_volunteers_view.dart';
 /// A widget that shows a list of [Shift] instances.
 class ShiftsView extends StatefulWidget {
   /// Create an instance.
-  const ShiftsView({required this.shifts, required this.apiKey, Key? key})
+  const ShiftsView({required this.shifts, required this.preferences, Key? key})
       : super(key: key);
 
   /// The shifts to show.
   final List<Shift> shifts;
 
-  /// The API key key to pass to [ShiftVolunteersView].
-  final String apiKey;
+  /// The preferences to pass to [ShiftVolunteersView].
+  final Preferences preferences;
 
   /// Create state for this widget.
   @override
@@ -39,7 +40,7 @@ class _ShiftsViewState extends State<ShiftsView> {
               Navigator.of(context).push<ShiftVolunteersView>(MaterialPageRoute(
             builder: (context) => ShiftVolunteersView(
               shift: shift,
-              apiKey: widget.apiKey,
+              preferences: widget.preferences,
             ),
           )),
         );
