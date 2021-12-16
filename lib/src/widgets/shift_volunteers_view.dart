@@ -41,8 +41,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
       for (final volunteerShift in widget.shift.volunteerShifts)
         volunteerShift.volunteer
     ];
-    final ignored =
-        widget.preferences.ignoredShiftIds.contains(widget.shift.id);
+    final ignored = widget.preferences.ignoredRotas.contains(widget.shift.rota);
     return Shortcuts(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.keyH, control: true):
@@ -123,10 +122,10 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
 
   /// Hide or unhide this shift.
   Future<void> hideUnhideShift() async {
-    if (widget.preferences.ignoredShiftIds.contains(widget.shift.id)) {
-      widget.preferences.ignoredShiftIds.remove(widget.shift.id);
+    if (widget.preferences.ignoredRotas.contains(widget.shift.rota)) {
+      widget.preferences.ignoredRotas.remove(widget.shift.rota);
     } else {
-      widget.preferences.ignoredShiftIds.add(widget.shift.id);
+      widget.preferences.ignoredRotas.add(widget.shift.rota);
     }
     setState(() {});
     final preferences = await SharedPreferences.getInstance();

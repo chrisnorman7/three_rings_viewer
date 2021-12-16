@@ -7,6 +7,7 @@ import '../constants.dart';
 import '../enumerations.dart';
 import '../intents.dart';
 import '../json/preferences.dart';
+import '../json/rota.dart';
 import '../json/shift.dart';
 import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
@@ -88,7 +89,7 @@ class _HomePageState extends State<HomePage> {
     final possibleShifts = shiftList.shifts
         .where((element) =>
             element.allDay == false &&
-            preferences.ignoredShiftIds.contains(element.id) == false)
+            preferences.ignoredRotas.contains(element.rota) == false)
         .toList()
       ..sort((a, b) {
         final result = a.start.compareTo(b.start);
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
             element.start.year == now.year &&
             element.start.month == now.month &&
             element.start.day == now.day &&
-            preferences.ignoredShiftIds.contains(element.id) == false)
+            preferences.ignoredRotas.contains(element.rota) == false)
         .toList();
     DateTime? previousStartTime;
     DateTime? nextStartTime;
@@ -257,6 +258,32 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+    final actions = <Widget>[
+      ElevatedButton(
+        onPressed: () => Navigator.of(context)
+            .pushReplacementNamed(ApiKeyForm.routeName, arguments: preferences),
+        child: Icon(
+          Icons.settings,
+          semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
+        ),
+      )
+    ];
+    if (_states == HomePageStates.shifts &&
+        preferences.ignoredRotas.isNotEmpty) {
+      actions.insert(
+          0,
+          PopupMenuButton<Rota>(
+            itemBuilder: (context) => [
+              for (final rota in preferences.ignoredRotas)
+                PopupMenuItem(
+                  child: Text(rota.name),
+                  value: rota,
+                ),
+            ],
+            child: const Text('Unhide Shifts'),
+            onSelected: (value) => preferences.ignoredRotas.remove(value),
+          ));
+    }
     return Shortcuts(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.digit1, control: true):
@@ -275,15 +302,7 @@ class _HomePageState extends State<HomePage> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(title),
-            leading: ElevatedButton(
-              onPressed: () => Navigator.of(context).pushReplacementNamed(
-                  ApiKeyForm.routeName,
-                  arguments: preferences),
-              child: Icon(
-                Icons.settings,
-                semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
-              ),
-            ),
+            actions: actions,
           ),
           body: child,
           bottomNavigationBar: BottomNavigationBar(

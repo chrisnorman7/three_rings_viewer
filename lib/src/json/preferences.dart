@@ -4,14 +4,16 @@ import 'dart:convert';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'rota.dart';
+
 part 'preferences.g.dart';
 
 /// App preferences.
 @JsonSerializable()
 class Preferences {
   /// Create an instance.
-  Preferences({this.apiKey, List<int>? ignoredShiftIds})
-      : ignoredShiftIds = ignoredShiftIds ?? [];
+  Preferences({this.apiKey, List<Rota>? ignoredRotas})
+      : ignoredRotas = ignoredRotas ?? [];
 
   /// Create an instance from a JSON object.
   factory Preferences.fromJson(Map<String, dynamic> json) =>
@@ -35,7 +37,7 @@ class Preferences {
   String? apiKey;
 
   /// A list of ignored shift IDs.
-  final List<int> ignoredShiftIds;
+  final List<Rota> ignoredRotas;
 
   /// Convert an instance to JSON.
   Map<String, dynamic> toJson() => _$PreferencesToJson(this);

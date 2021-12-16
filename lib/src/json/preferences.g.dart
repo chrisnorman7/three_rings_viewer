@@ -8,13 +8,13 @@ part of 'preferences.dart';
 
 Preferences _$PreferencesFromJson(Map<String, dynamic> json) => Preferences(
       apiKey: json['apiKey'] as String?,
-      ignoredShiftIds: (json['ignoredShiftIds'] as List<dynamic>?)
-          ?.map((e) => e as int)
+      ignoredRotas: (json['ignoredRotas'] as List<dynamic>?)
+          ?.map((e) => Rota.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$PreferencesToJson(Preferences instance) =>
     <String, dynamic>{
       'apiKey': instance.apiKey,
-      'ignoredShiftIds': instance.ignoredShiftIds,
+      'ignoredRotas': instance.ignoredRotas,
     };
