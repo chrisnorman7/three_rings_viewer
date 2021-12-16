@@ -38,11 +38,7 @@ class _ShiftsViewState extends State<ShiftsView> {
           onTap: () =>
               Navigator.of(context).push<ShiftVolunteersView>(MaterialPageRoute(
             builder: (context) => ShiftVolunteersView(
-              title: shift.title,
-              volunteers: [
-                for (final volunteerShift in shift.volunteerShifts)
-                  volunteerShift.volunteer
-              ],
+              shift: shift,
               apiKey: widget.apiKey,
             ),
           )),
