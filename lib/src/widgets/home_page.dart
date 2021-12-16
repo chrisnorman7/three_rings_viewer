@@ -8,7 +8,6 @@ import '../enumerations.dart';
 import '../intents.dart';
 import '../json/preferences.dart';
 import '../json/rota.dart';
-import '../json/shift.dart';
 import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
 import '../util.dart';
@@ -68,7 +67,9 @@ class _HomePageState extends State<HomePage> {
           if (snapshot.hasData) {
             final preferences =
                 Preferences.fromSharedPreferences(snapshot.requireData);
-            return getHomePage(preferences);
+            return getHomePage(
+                preferences: preferences,
+                sharedPreferences: snapshot.requireData);
           } else {
             return Scaffold(
               appBar: AppBar(
@@ -83,62 +84,10 @@ class _HomePageState extends State<HomePage> {
         future: _sharedPreferencesFuture,
       );
 
-  /// Get a list of relevant shifts.
-  List<Shift> getShifts(
-      {required ShiftList shiftList, required Preferences preferences}) {
-    final possibleShifts = shiftList.shifts
-        .where((element) =>
-            element.allDay == false &&
-            preferences.ignoredRotas.contains(element.rota) == false)
-        .toList()
-      ..sort((a, b) {
-        final result = a.start.compareTo(b.start);
-        if (result == 0) {
-          if (a.rota.name.startsWith('Leader')) {
-            return -1;
-          }
-          return b.rota.name.compareTo(a.rota.name);
-        }
-        return result;
-      });
-    final now = DateTime.now();
-    final shifts = shiftList.shifts
-        .where((element) =>
-            element.allDay == true &&
-            element.start.year == now.year &&
-            element.start.month == now.month &&
-            element.start.day == now.day &&
-            preferences.ignoredRotas.contains(element.rota) == false)
-        .toList();
-    DateTime? previousStartTime;
-    DateTime? nextStartTime;
-    for (final shift in possibleShifts) {
-      if ((previousStartTime == null ||
-              shift.start.isAfter(previousStartTime)) &&
-          shift.end.isBefore(now)) {
-        previousStartTime = shift.start;
-      } else if ((nextStartTime == null ||
-              shift.start.isBefore(nextStartTime)) &&
-          shift.start.isAfter(now)) {
-        nextStartTime = shift.start;
-      }
-    }
-    if (previousStartTime != null) {
-      shifts.addAll(possibleShifts.where((element) =>
-          element.start.isAtSameMomentAs(previousStartTime!) &&
-          element.end.isBefore(now)));
-    }
-    shifts.addAll(possibleShifts.where(
-        (element) => element.start.isBefore(now) && element.end.isAfter(now)));
-    if (nextStartTime != null) {
-      shifts.addAll(possibleShifts
-          .where((element) => element.start.isAtSameMomentAs(nextStartTime!)));
-    }
-    return shifts;
-  }
-
   /// Get the main home page.
-  Widget getHomePage(Preferences preferences) {
+  Widget getHomePage(
+      {required Preferences preferences,
+      required SharedPreferences sharedPreferences}) {
     final Widget child;
     final String title;
     final apiKey = preferences.apiKey;
@@ -190,15 +139,14 @@ class _HomePageState extends State<HomePage> {
                 _shiftList = shiftList;
                 _shiftsDownloaded = today;
                 return ShiftsView(
-                  shifts:
-                      getShifts(preferences: preferences, shiftList: shiftList),
+                  shiftList: shiftList,
                   preferences: preferences,
                 );
               },
             );
           } else {
             child = ShiftsView(
-              shifts: getShifts(preferences: preferences, shiftList: shiftList),
+              shiftList: shiftList,
               preferences: preferences,
             );
           }
@@ -258,31 +206,23 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
-    final actions = <Widget>[
-      ElevatedButton(
-        onPressed: () => Navigator.of(context)
-            .pushReplacementNamed(ApiKeyForm.routeName, arguments: preferences),
-        child: Icon(
-          Icons.settings,
-          semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
-        ),
-      )
-    ];
+    final actions = <Widget>[];
     if (_states == HomePageStates.shifts &&
         preferences.ignoredRotas.isNotEmpty) {
-      actions.insert(
-          0,
-          PopupMenuButton<Rota>(
-            itemBuilder: (context) => [
-              for (final rota in preferences.ignoredRotas)
-                PopupMenuItem(
-                  child: Text(rota.name),
-                  value: rota,
-                ),
-            ],
-            child: const Text('Unhide Shifts'),
-            onSelected: (value) => preferences.ignoredRotas.remove(value),
-          ));
+      actions.add(PopupMenuButton<Rota>(
+          itemBuilder: (context) => [
+                for (final rota in preferences.ignoredRotas)
+                  PopupMenuItem(
+                    child: Text(rota.name),
+                    value: rota,
+                  ),
+              ],
+          child: const Text('Unhide Shifts'),
+          onSelected: (value) => setState(() {
+                preferences.ignoredRotas
+                    .removeWhere((element) => element.id == value.id);
+                preferences.save(sharedPreferences);
+              })));
     }
     return Shortcuts(
       shortcuts: const {
@@ -301,6 +241,15 @@ class _HomePageState extends State<HomePage> {
         },
         child: Scaffold(
           appBar: AppBar(
+            leading: ElevatedButton(
+              onPressed: () => Navigator.of(context).pushReplacementNamed(
+                  ApiKeyForm.routeName,
+                  arguments: preferences),
+              child: Icon(
+                Icons.settings,
+                semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
+              ),
+            ),
             title: Text(title),
             actions: actions,
           ),

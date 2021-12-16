@@ -48,4 +48,12 @@ class Preferences {
     return sharedPreferences.setString(
         _keyName, const JsonEncoder.withIndent('  ').convert(json));
   }
+
+  /// Returns `true` if the given [rota] should be hidden.
+  bool rotaHidden(Rota rota) =>
+      ignoredRotas.where((element) => element.id == rota.id).isNotEmpty;
+
+  /// Returns `true` if the given [rota] should not be hidden.
+  bool rotaUnhidden(Rota rota) =>
+      ignoredRotas.where((element) => element.id == rota.id).isEmpty;
 }

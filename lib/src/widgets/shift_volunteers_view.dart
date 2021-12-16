@@ -41,7 +41,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
       for (final volunteerShift in widget.shift.volunteerShifts)
         volunteerShift.volunteer
     ];
-    final ignored = widget.preferences.ignoredRotas.contains(widget.shift.rota);
+    final ignored = widget.preferences.rotaHidden(widget.shift.rota);
     return Shortcuts(
       shortcuts: const {
         SingleActivator(LogicalKeyboardKey.keyH, control: true):
@@ -56,7 +56,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
         child: CancellableWidget(
           child: Scaffold(
             appBar: AppBar(
-              title: Text(widget.shift.title),
+              title: Text(widget.shift.rota.name),
               actions: [
                 ElevatedButton(
                   child: Text(ignored ? 'Unhide Shift' : 'Hide Shift'),
@@ -122,8 +122,12 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
 
   /// Hide or unhide this shift.
   Future<void> hideUnhideShift() async {
-    if (widget.preferences.ignoredRotas.contains(widget.shift.rota)) {
-      widget.preferences.ignoredRotas.remove(widget.shift.rota);
+    if (widget.preferences.ignoredRotas
+        .where((element) => element.id == widget.shift.rota.id)
+        .isNotEmpty) {
+      widget.preferences.ignoredRotas.removeWhere(
+        (element) => element.id == widget.shift.rota.id,
+      );
     } else {
       widget.preferences.ignoredRotas.add(widget.shift.rota);
     }
