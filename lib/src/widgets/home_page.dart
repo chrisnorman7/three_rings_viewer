@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
 import '../enumerations.dart';
+import '../intents.dart';
 import '../json/preferences.dart';
 import '../json/shift.dart';
 import '../json/shift_list.dart';
@@ -165,38 +167,75 @@ class _HomePageState extends State<HomePage> {
                   break;
               }
             }
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(title),
-                leading: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushReplacementNamed(
-                      ApiKeyForm.routeName,
-                      arguments: preferences),
-                  child: Icon(
-                    Icons.settings,
-                    semanticLabel:
-                        '${apiKey == null ? "Enter" : "Change"} API key',
+            final tabCallback = CallbackAction(
+              onInvoke: (intent) {
+                if (intent is ShiftsTabIntent) {
+                  setState(() {
+                    _states = HomePageStates.shifts;
+                  });
+                } else if (intent is VolunteersTabIntent) {
+                  setState(() {
+                    _states = HomePageStates.volunteers;
+                  });
+                } else if (intent is NewsTabIntent) {
+                  setState(() {
+                    _states = HomePageStates.news;
+                  });
+                } else {
+                  throw UnimplementedError('Unsupported intent: $intent.');
+                }
+              },
+            );
+            return Shortcuts(
+              shortcuts: const {
+                SingleActivator(LogicalKeyboardKey.digit1, control: true):
+                    ShiftsTabIntent(),
+                SingleActivator(LogicalKeyboardKey.digit2, control: true):
+                    VolunteersTabIntent(),
+                SingleActivator(LogicalKeyboardKey.digit3, control: true):
+                    NewsTabIntent()
+              },
+              child: Actions(
+                actions: {
+                  ShiftsTabIntent: tabCallback,
+                  VolunteersTabIntent: tabCallback,
+                  NewsTabIntent: tabCallback
+                },
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text(title),
+                    leading: ElevatedButton(
+                      onPressed: () => Navigator.of(context)
+                          .pushReplacementNamed(ApiKeyForm.routeName,
+                              arguments: preferences),
+                      child: Icon(
+                        Icons.settings,
+                        semanticLabel:
+                            '${apiKey == null ? "Enter" : "Change"} API key',
+                      ),
+                    ),
+                  ),
+                  body: child,
+                  bottomNavigationBar: BottomNavigationBar(
+                    items: const [
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.calendar_today_rounded),
+                          label: 'Shifts'),
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.people_rounded),
+                          label: 'Volunteers'),
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.info_rounded), label: 'News')
+                    ],
+                    currentIndex: _states.index,
+                    onTap: preferences.apiKey == null
+                        ? null
+                        : (value) => setState(() {
+                              _states = HomePageStates.values.firstWhere(
+                                  (element) => element.index == value);
+                            }),
                   ),
                 ),
-              ),
-              body: child,
-              bottomNavigationBar: BottomNavigationBar(
-                items: const [
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.calendar_today_rounded),
-                      label: 'Shifts'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.people_rounded), label: 'Volunteers'),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.info_rounded), label: 'News')
-                ],
-                currentIndex: _states.index,
-                onTap: preferences.apiKey == null
-                    ? null
-                    : (value) => setState(() {
-                          _states = HomePageStates.values
-                              .firstWhere((element) => element.index == value);
-                        }),
               ),
             );
           } else {
