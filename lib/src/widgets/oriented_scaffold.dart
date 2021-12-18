@@ -80,6 +80,8 @@ class _OrientedScaffoldState extends State<OrientedScaffold> {
                             icon: e.icon, label: e.label),
                       )
                       .toList(),
+                  currentIndex: widget.selectedIndex,
+                  onTap: widget.onNavigate,
                 )
               : null,
         ),
