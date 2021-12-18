@@ -49,6 +49,9 @@ class _HomePageState extends State<HomePage> {
   /// The last time shifts were downloaded.
   DateTime? _shiftsDownloaded;
 
+  /// Decides which shifts to show.
+  late ShiftViews _shiftView;
+
   /// The loaded volunteers list.
   VolunteerList? _volunteerList;
 
@@ -65,6 +68,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _shiftView = ShiftViews.relevant;
     _states = HomePageStates.shifts;
     _sharedPreferencesFuture = SharedPreferences.getInstance();
   }
@@ -129,26 +133,48 @@ class _HomePageState extends State<HomePage> {
           if (shiftList == null ||
               shiftsDownloaded == null ||
               now.difference(shiftsDownloaded) >= httpGetInterval) {
-            final yesterday = now.subtract(const Duration(days: 1));
-            final tomorrow = now.add(const Duration(days: 1));
-            var stuff = [
-              yesterday.year,
-              padNumber(yesterday.month),
-              padNumber(yesterday.day)
-            ];
-            final startDate = stuff.join('-');
-            stuff = [
-              tomorrow.year,
-              padNumber(tomorrow.month),
-              padNumber(tomorrow.day)
-            ];
-            final endDate = stuff.join('-');
+            Map<String, String> queryParams;
+            switch (_shiftView) {
+              case ShiftViews.relevant:
+                final yesterday = now.subtract(const Duration(days: 1));
+                final tomorrow = now.add(const Duration(days: 1));
+                var stuff = [
+                  yesterday.year,
+                  padNumber(yesterday.month),
+                  padNumber(yesterday.day)
+                ];
+                final startDate = stuff.join('-');
+                stuff = [
+                  tomorrow.year,
+                  padNumber(tomorrow.month),
+                  padNumber(tomorrow.day)
+                ];
+                final endDate = stuff.join('-');
+                queryParams = {'start_date': startDate, 'end_date': endDate};
+                break;
+              case ShiftViews.today:
+                final tomorrow = now.add(const Duration(days: 1));
+                var stuff = [
+                  now.year,
+                  now.month.toString().padLeft(2, '0'),
+                  now.day.toString().padLeft(2, '0')
+                ];
+                final startDate = stuff.join('-');
+                stuff = [
+                  tomorrow.year,
+                  tomorrow.month.toString().padLeft(2, '0'),
+                  tomorrow.day.toString().padLeft(2, '0')
+                ];
+                final endDate = stuff.join('-');
+                queryParams = {
+                  'start_date': startDate,
+                  'end_date': endDate,
+                };
+                break;
+            }
             final future = http.get<JsonType>(
               '$baseUrl/shift.json',
-              queryParameters: <String, dynamic>{
-                'start_date': startDate,
-                'end_date': endDate
-              },
+              queryParameters: queryParams,
             );
             child = GetUrlWidget(
               future: future,
@@ -162,6 +188,7 @@ class _HomePageState extends State<HomePage> {
                 return ShiftsView(
                   shiftList: shiftList,
                   preferences: preferences,
+                  shiftView: _shiftView,
                 );
               },
             );
@@ -169,6 +196,7 @@ class _HomePageState extends State<HomePage> {
             child = ShiftsView(
               shiftList: shiftList,
               preferences: preferences,
+              shiftView: _shiftView,
             );
           }
           break;
@@ -255,22 +283,33 @@ class _HomePageState extends State<HomePage> {
       },
     );
     final actions = <Widget>[];
-    if (_states == HomePageStates.shifts &&
-        preferences.ignoredRotas.isNotEmpty) {
-      actions.add(PopupMenuButton<Rota>(
-          itemBuilder: (context) => [
-                for (final rota in preferences.ignoredRotas)
-                  PopupMenuItem(
-                    child: Text(rota.name),
-                    value: rota,
-                  ),
-              ],
-          child: const Text('Unhide Shifts'),
-          onSelected: (value) => setState(() {
-                preferences.ignoredRotas
-                    .removeWhere((element) => element.id == value.id);
-                preferences.save(sharedPreferences);
-              })));
+    if (_states == HomePageStates.shifts) {
+      if (preferences.ignoredRotas.isNotEmpty) {
+        actions.add(PopupMenuButton<Rota>(
+            itemBuilder: (context) => [
+                  for (final rota in preferences.ignoredRotas)
+                    PopupMenuItem(
+                      child: Text(rota.name),
+                      value: rota,
+                    ),
+                ],
+            child: const Text('Unhide Shifts'),
+            onSelected: (value) => setState(() {
+                  preferences.ignoredRotas
+                      .removeWhere((element) => element.id == value.id);
+                  preferences.save(sharedPreferences);
+                })));
+      }
+      actions.add(ElevatedButton(
+          onPressed: () => setState(() {
+                _shiftList = null;
+                _shiftsDownloaded = null;
+                _shiftView = (_shiftView == ShiftViews.relevant)
+                    ? ShiftViews.today
+                    : ShiftViews.relevant;
+              }),
+          child: Text(
+              _shiftView == ShiftViews.relevant ? 'All Day' : 'Relevant')));
     }
     return Shortcuts(
         shortcuts: const {

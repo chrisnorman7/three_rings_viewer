@@ -1,6 +1,7 @@
 /// Provides the [ShiftsView] class.
 import 'package:flutter/material.dart';
 
+import '../enumerations.dart';
 import '../json/preferences.dart';
 import '../json/shift.dart';
 import '../json/shift_list.dart';
@@ -11,7 +12,10 @@ import 'shift_volunteers_view.dart';
 class ShiftsView extends StatefulWidget {
   /// Create an instance.
   const ShiftsView(
-      {required this.shiftList, required this.preferences, Key? key})
+      {required this.shiftList,
+      required this.preferences,
+      required this.shiftView,
+      Key? key})
       : super(key: key);
 
   /// The shifts to show.
@@ -19,6 +23,9 @@ class ShiftsView extends StatefulWidget {
 
   /// The preferences to pass to [ShiftVolunteersView].
   final Preferences preferences;
+
+  /// Which view to use.
+  final ShiftViews shiftView;
 
   /// Create state for this widget.
   @override
@@ -72,39 +79,44 @@ class _ShiftsViewState extends State<ShiftsView> {
         }
         return result;
       });
-    final now = DateTime.now();
-    final shifts = widget.shiftList.shifts
-        .where((element) =>
-            element.allDay == true &&
-            element.start.year == now.year &&
-            element.start.month == now.month &&
-            element.start.day == now.day &&
-            widget.preferences.rotaUnhidden(element.rota))
-        .toList();
-    DateTime? previousStartTime;
-    DateTime? nextStartTime;
-    for (final shift in possibleShifts) {
-      if ((previousStartTime == null ||
-              shift.start.isAfter(previousStartTime)) &&
-          shift.end.isBefore(now)) {
-        previousStartTime = shift.start;
-      } else if ((nextStartTime == null ||
-              shift.start.isBefore(nextStartTime)) &&
-          shift.start.isAfter(now)) {
-        nextStartTime = shift.start;
+    if (widget.shiftView == ShiftViews.relevant) {
+      final now = DateTime.now();
+      final shifts = widget.shiftList.shifts
+          .where((element) =>
+              element.allDay == true &&
+              element.start.year == now.year &&
+              element.start.month == now.month &&
+              element.start.day == now.day &&
+              widget.preferences.rotaUnhidden(element.rota))
+          .toList();
+      DateTime? previousStartTime;
+      DateTime? nextStartTime;
+      for (final shift in possibleShifts) {
+        if ((previousStartTime == null ||
+                shift.start.isAfter(previousStartTime)) &&
+            shift.end.isBefore(now)) {
+          previousStartTime = shift.start;
+        } else if ((nextStartTime == null ||
+                shift.start.isBefore(nextStartTime)) &&
+            shift.start.isAfter(now)) {
+          nextStartTime = shift.start;
+        }
       }
-    }
-    if (previousStartTime != null) {
+      if (previousStartTime != null) {
+        shifts.addAll(possibleShifts.where((element) =>
+            element.start.isAtSameMomentAs(previousStartTime!) &&
+            element.end.isBefore(now)));
+      }
       shifts.addAll(possibleShifts.where((element) =>
-          element.start.isAtSameMomentAs(previousStartTime!) &&
-          element.end.isBefore(now)));
+          element.start.isBefore(now) && element.end.isAfter(now)));
+      if (nextStartTime != null) {
+        shifts.addAll(possibleShifts.where(
+            (element) => element.start.isAtSameMomentAs(nextStartTime!)));
+      }
+      return shifts;
     }
-    shifts.addAll(possibleShifts.where(
-        (element) => element.start.isBefore(now) && element.end.isAfter(now)));
-    if (nextStartTime != null) {
-      shifts.addAll(possibleShifts
-          .where((element) => element.start.isAtSameMomentAs(nextStartTime!)));
-    }
-    return shifts;
+    return widget.shiftList.shifts
+        .where((element) => widget.preferences.rotaUnhidden(element.rota))
+        .toList();
   }
 }

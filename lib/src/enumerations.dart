@@ -25,3 +25,12 @@ enum VolunteerViewStates {
   /// More.
   more,
 }
+
+/// The various views available for shifts.
+enum ShiftViews {
+  /// Show only relevant shifts.
+  relevant,
+
+  /// Show every shift today.
+  today,
+}
