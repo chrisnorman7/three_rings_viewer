@@ -30,17 +30,11 @@ class _NewsItemViewState extends State<NewsItemView> {
   /// Build a widget.
   @override
   Widget build(BuildContext context) {
-    final children = [
+    final children = <InlineSpan>[
       TextSpan(
-          text: 'Created: ${prettyDate(widget.newsItem.createdAt)} by '
-              '${widget.newsItem.creator.name}.',
+          text: '\nCreated: ${prettyDate(widget.newsItem.createdAt)} by '
+              '${widget.newsItem.creator.name}.\n',
           style: normalStyle),
-      WidgetSpan(
-          child: Image.network(
-        getImageUrl(widget.newsItem.creator.id),
-        headers: getHeaders(apiKey: widget.apiKey),
-        semanticLabel: widget.newsItem.creator.name,
-      ))
     ];
     final htmlUnescape = HtmlUnescape();
     for (var line in widget.newsItem.body.split('\n')) {
