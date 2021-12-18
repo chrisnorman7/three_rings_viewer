@@ -76,9 +76,6 @@ class DirectoryVolunteer {
   @JsonKey(name: 'volunteer_properties')
   final List<Map<String, VolunteerProperty>> volunteerProperties;
 
-  /// The URL to the image of this volunteer.
-  String get imageUrl => 'https://www.3r.org.uk/directory/$id/photos/thumb.jpg';
-
   /// Convert an instance to JSON.
   Map<String, dynamic> toJson() => _$DirectoryVolunteerToJson(this);
 }

@@ -114,7 +114,7 @@ class _VolunteerViewState extends State<VolunteerView> {
         break;
       case VolunteerViewStates.image:
         child = Image.network(
-          widget.volunteer.imageUrl,
+          getImageUrl(widget.volunteer.id),
           headers: getHeaders(apiKey: widget.apiKey),
           semanticLabel: 'Image of ${widget.volunteer.name}.',
           fit: BoxFit.cover,
@@ -173,7 +173,7 @@ class _VolunteerViewState extends State<VolunteerView> {
                 icon: Icon(Icons.details_rounded), label: 'Details'),
             BottomNavigationBarItem(
                 icon: Image.network(
-                  widget.volunteer.imageUrl,
+                  getImageUrl(widget.volunteer.id),
                   headers: getHeaders(apiKey: widget.apiKey),
                 ),
                 label: 'Image'),

@@ -1,4 +1,3 @@
-/// Provides the [GetUrlWidget] class.
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +27,15 @@ class _GetUrlWidgetState extends State<GetUrlWidget> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final data = snapshot.requireData;
-            return widget.onLoad(data.data);
+            try {
+              return widget.onLoad(data.data);
+            } catch (e) {
+              print(e);
+              print(data);
+              return const Center(
+                child: Text('Fucked.'),
+              );
+            }
           } else if (snapshot.hasError) {
             return ListView(
               children: [

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
 import '../enumerations.dart';
 import '../intents.dart';
+import '../json/news_list.dart';
 import '../json/preferences.dart';
 import '../json/rota.dart';
 import '../json/shift_list.dart';
@@ -13,6 +14,7 @@ import '../json/volunteer_list.dart';
 import '../util.dart';
 import 'api_key_form.dart';
 import 'get_url_widget.dart';
+import 'news_view.dart';
 import 'shifts_view.dart';
 import 'volunteers_view.dart';
 
@@ -52,6 +54,12 @@ class _HomePageState extends State<HomePage> {
   /// The last time volunteers were downloaded.
   DateTime? _volunteersDownloaded;
 
+  /// The loaded news list.
+  NewsList? _newsList;
+
+  /// The last time the news was downloaded.
+  DateTime? _newsDownloaded;
+
   /// Start [_sharedPreferencesFuture] running.
   @override
   void initState() {
@@ -70,6 +78,18 @@ class _HomePageState extends State<HomePage> {
             return getHomePage(
                 preferences: preferences,
                 sharedPreferences: snapshot.requireData);
+          } else if (snapshot.hasError) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Error')),
+              body: Focus(
+                  child: RichText(
+                text: TextSpan(children: [
+                  TextSpan(text: snapshot.error.toString()),
+                  const TextSpan(text: '\n'),
+                  TextSpan(text: snapshot.stackTrace.toString())
+                ]),
+              )),
+            );
           } else {
             return Scaffold(
               appBar: AppBar(
@@ -99,17 +119,17 @@ class _HomePageState extends State<HomePage> {
     } else {
       final options = BaseOptions(headers: getHeaders(apiKey: apiKey));
       final http = Dio(options);
+      final now = DateTime.now();
       switch (_states) {
         case HomePageStates.shifts:
           title = 'Shifts';
           final shiftList = _shiftList;
           final shiftsDownloaded = _shiftsDownloaded;
-          final today = DateTime.now();
           if (shiftList == null ||
               shiftsDownloaded == null ||
-              today.difference(shiftsDownloaded) >= httpGetInterval) {
-            final yesterday = today.subtract(const Duration(days: 1));
-            final tomorrow = today.add(const Duration(days: 1));
+              now.difference(shiftsDownloaded) >= httpGetInterval) {
+            final yesterday = now.subtract(const Duration(days: 1));
+            final tomorrow = now.add(const Duration(days: 1));
             var stuff = [
               yesterday.year,
               padNumber(yesterday.month),
@@ -137,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                 }
                 final shiftList = ShiftList.fromJson(json);
                 _shiftList = shiftList;
-                _shiftsDownloaded = today;
+                _shiftsDownloaded = now;
                 return ShiftsView(
                   shiftList: shiftList,
                   preferences: preferences,
@@ -155,7 +175,6 @@ class _HomePageState extends State<HomePage> {
           title = 'Volunteers';
           final volunteers = _volunteerList?.volunteers;
           final volunteersDownloaded = _volunteersDownloaded;
-          final now = DateTime.now();
           if (volunteers == null ||
               volunteersDownloaded == null ||
               now.difference(volunteersDownloaded) >= httpGetInterval) {
@@ -183,7 +202,35 @@ class _HomePageState extends State<HomePage> {
           break;
         case HomePageStates.news:
           title = 'News';
-          child = const Focus(child: Text('News'));
+          final newsList = _newsList;
+          final newsDownloaded = _newsDownloaded;
+          if (newsList == null ||
+              newsDownloaded == null ||
+              now.difference(newsDownloaded) >= httpGetInterval) {
+            final future = http.get<JsonType>('$baseUrl/news.json');
+            child = GetUrlWidget(
+                future: future,
+                onLoad: (json) {
+                  if (json == null) {
+                    return const Focus(
+                        child: Center(
+                      child: Text('No news items to show.'),
+                    ));
+                  }
+                  final newsList = NewsList.fromJson(json);
+                  _newsList = newsList;
+                  _newsDownloaded = now;
+                  return NewsView(
+                    newsList: newsList,
+                    apiKey: apiKey,
+                  );
+                });
+          } else {
+            child = NewsView(
+              newsList: newsList,
+              apiKey: apiKey,
+            );
+          }
           break;
       }
     }
@@ -254,23 +301,26 @@ class _HomePageState extends State<HomePage> {
             actions: actions,
           ),
           body: child,
-          bottomNavigationBar: BottomNavigationBar(
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.calendar_today_rounded), label: 'Shifts'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.people_rounded), label: 'Volunteers'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.info_rounded), label: 'News')
-            ],
-            currentIndex: _states.index,
-            onTap: preferences.apiKey == null
-                ? null
-                : (value) => setState(() {
-                      _states = HomePageStates.values
-                          .firstWhere((element) => element.index == value);
-                    }),
-          ),
+          bottomNavigationBar: preferences.apiKey == null
+              ? null
+              : BottomNavigationBar(
+                  items: const [
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.calendar_today_rounded),
+                        label: 'Shifts'),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.people_rounded), label: 'Volunteers'),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.info_rounded), label: 'News')
+                  ],
+                  currentIndex: _states.index,
+                  onTap: preferences.apiKey == null
+                      ? null
+                      : (value) => setState(() {
+                            _states = HomePageStates.values.firstWhere(
+                                (element) => element.index == value);
+                          }),
+                ),
         ),
       ),
     );

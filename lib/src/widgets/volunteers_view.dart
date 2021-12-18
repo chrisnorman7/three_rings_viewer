@@ -41,7 +41,7 @@ class _VolunteersViewState extends State<VolunteersView> {
               icon: Column(
                 children: [
                   Image.network(
-                    volunteer.imageUrl,
+                    getImageUrl(volunteer.id),
                     headers: getHeaders(apiKey: widget.apiKey),
                     semanticLabel: volunteer.name,
                   ),

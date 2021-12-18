@@ -20,6 +20,8 @@ dependencies:
   dio: ^4.0.4
   flutter:
     sdk: flutter
+  flutter_html: ^2.2.1
+  html_unescape: ^2.0.0
   json_annotation: ^4.4.0
   shared_preferences: ^2.0.11
   url_launcher: ^6.0.17
