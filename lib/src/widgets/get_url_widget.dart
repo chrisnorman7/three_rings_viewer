@@ -29,12 +29,12 @@ class _GetUrlWidgetState extends State<GetUrlWidget> {
             final data = snapshot.requireData;
             try {
               return widget.onLoad(data.data);
-            } catch (e) {
-              print(e);
-              print(data);
-              return const Center(
-                child: Text('Fucked.'),
-              );
+            } catch (e, s) {
+              return RichText(
+                  text: TextSpan(children: [
+                TextSpan(text: e.toString()),
+                ...s.toString().split('\n').map((e) => TextSpan(text: e))
+              ]));
             }
           } else if (snapshot.hasError) {
             return ListView(
