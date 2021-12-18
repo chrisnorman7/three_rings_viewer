@@ -6,9 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../enumerations.dart';
 import '../json/directory_volunteer.dart';
-import '../navigation_tab.dart';
 import '../util.dart';
 import 'cancellable_widget.dart';
+import 'oriented_scaffold.dart';
 
 /// A widget to show volunteer details.
 class VolunteerView extends StatefulWidget {
@@ -38,12 +38,6 @@ class _VolunteerViewState extends State<VolunteerView> {
   /// Build a widget.
   @override
   Widget build(BuildContext context) {
-    final tabs = [
-      const NavigationTab(icon: Icon(Icons.details_rounded), label: 'Details'),
-      const NavigationTab(
-          icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
-      const NavigationTab(icon: Icon(Icons.more_rounded), label: 'More')
-    ];
     var title = widget.volunteer.name;
     if (widget.volunteer.isSupportPerson) {
       title += ' (Support Volunteer)';
@@ -155,41 +149,22 @@ class _VolunteerViewState extends State<VolunteerView> {
         break;
     }
     return CancellableWidget(
-      child: OrientationBuilder(
-        builder: (context, orientation) => Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-          ),
-          body: Row(children: [
-            Expanded(child: child),
-            const VerticalDivider(
-              width: 1,
-              thickness: 1,
-            ),
-            NavigationRail(
-              destinations: [
-                ...tabs.map((e) => NavigationRailDestination(
-                    icon: e.icon, label: Text(e.label)))
-              ],
-              selectedIndex: _state.index,
-              onDestinationSelected: (value) => setState(() => _state =
-                  VolunteerViewStates.values
-                      .firstWhere((element) => element.index == value)),
-            )
-          ]),
-          bottomNavigationBar: orientation == Orientation.portrait
-              ? BottomNavigationBar(
-                  items: [
-                    ...tabs.map((e) =>
-                        BottomNavigationBarItem(icon: e.icon, label: e.label))
-                  ],
-                  currentIndex: _state.index,
-                  onTap: (value) => setState(() {
-                    _state = VolunteerViewStates.values
-                        .firstWhere((element) => element.index == value);
-                  }),
-                )
-              : null,
+      child: OrientedScaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        child: child,
+        tabs: const [
+          OrientedScaffoldTab(
+              icon: Icon(Icons.details_rounded), label: 'Details'),
+          OrientedScaffoldTab(
+              icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
+          OrientedScaffoldTab(icon: Icon(Icons.more_rounded), label: 'More')
+        ],
+        selectedIndex: _state.index,
+        onNavigate: (value) => setState(
+          () => _state = VolunteerViewStates.values
+              .firstWhere((element) => element.index == value),
         ),
       ),
     );
