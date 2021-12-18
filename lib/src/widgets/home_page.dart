@@ -11,6 +11,7 @@ import '../json/preferences.dart';
 import '../json/rota.dart';
 import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
+import '../navigation_tab.dart';
 import '../util.dart';
 import 'api_key_form.dart';
 import 'get_url_widget.dart';
@@ -108,6 +109,11 @@ class _HomePageState extends State<HomePage> {
   Widget getHomePage(
       {required Preferences preferences,
       required SharedPreferences sharedPreferences}) {
+    const tabs = [
+      NavigationTab(icon: Icon(Icons.calendar_today_rounded), label: 'Shifts'),
+      NavigationTab(icon: Icon(Icons.people_rounded), label: 'Volunteers'),
+      NavigationTab(icon: Icon(Icons.info_rounded), label: 'News')
+    ];
     final Widget child;
     final String title;
     final apiKey = preferences.apiKey;
@@ -286,41 +292,59 @@ class _HomePageState extends State<HomePage> {
           VolunteersTabIntent: tabCallback,
           NewsTabIntent: tabCallback
         },
-        child: Scaffold(
-          appBar: AppBar(
-            leading: ElevatedButton(
-              onPressed: () => Navigator.of(context).pushReplacementNamed(
-                  ApiKeyForm.routeName,
-                  arguments: preferences),
-              child: Icon(
-                Icons.settings,
-                semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
-              ),
-            ),
-            title: Text(title),
-            actions: actions,
-          ),
-          body: child,
-          bottomNavigationBar: preferences.apiKey == null
-              ? null
-              : BottomNavigationBar(
-                  items: const [
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.calendar_today_rounded),
-                        label: 'Shifts'),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.people_rounded), label: 'Volunteers'),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.info_rounded), label: 'News')
-                  ],
-                  currentIndex: _states.index,
-                  onTap: preferences.apiKey == null
-                      ? null
-                      : (value) => setState(() {
-                            _states = HomePageStates.values.firstWhere(
-                                (element) => element.index == value);
-                          }),
+        child: OrientationBuilder(
+          builder: (context, orientation) => Scaffold(
+            appBar: AppBar(
+              leading: ElevatedButton(
+                onPressed: () => Navigator.of(context).pushReplacementNamed(
+                    ApiKeyForm.routeName,
+                    arguments: preferences),
+                child: Icon(
+                  Icons.settings,
+                  semanticLabel:
+                      '${apiKey == null ? "Enter" : "Change"} API key',
                 ),
+              ),
+              title: Text(title),
+              actions: actions,
+            ),
+            body: orientation == Orientation.portrait
+                ? child
+                : Row(
+                    children: [
+                      Expanded(child: child),
+                      const VerticalDivider(width: 1, thickness: 1),
+                      NavigationRail(
+                        destinations: [
+                          ...tabs.map((e) => NavigationRailDestination(
+                              icon: e.icon, label: Text(e.label)))
+                        ],
+                        selectedIndex: _states.index,
+                        onDestinationSelected: preferences.apiKey == null
+                            ? null
+                            : (value) => setState(() {
+                                  _states = HomePageStates.values.firstWhere(
+                                      (element) => element.index == value);
+                                }),
+                      ),
+                    ],
+                  ),
+            bottomNavigationBar: orientation == Orientation.portrait
+                ? BottomNavigationBar(
+                    items: [
+                      ...tabs.map((e) =>
+                          BottomNavigationBarItem(icon: e.icon, label: e.label))
+                    ],
+                    currentIndex: _states.index,
+                    onTap: preferences.apiKey == null
+                        ? null
+                        : (value) => setState(() {
+                              _states = HomePageStates.values.firstWhere(
+                                  (element) => element.index == value);
+                            }),
+                  )
+                : null,
+          ),
         ),
       ),
     );
