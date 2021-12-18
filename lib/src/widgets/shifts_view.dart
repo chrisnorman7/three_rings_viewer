@@ -62,25 +62,33 @@ class _ShiftsViewState extends State<ShiftsView> {
         itemCount: shifts.length);
   }
 
+  /// Compare the names of shift [a], and shift [b].
+  int compareShiftNames(Shift a, Shift b) {
+    if (a.start.isAtSameMomentAs(b.start) && a.end.isAtSameMomentAs(b.end)) {
+      if (b.rota.name.toLowerCase().startsWith('leader')) {
+        return 1;
+      }
+      return a.rota.name.compareTo(b.rota.name);
+    }
+    return a.start.compareTo(b.start);
+  }
+
+  /// Returns `true` if [dateTime] happens on the same day as [origin].
+  bool isOnSameDayAs({required DateTime dateTime, required DateTime origin}) =>
+      dateTime.year == origin.year &&
+      dateTime.month == origin.month &&
+      dateTime.day == origin.day;
+
   /// Get a list of relevant shifts.
   List<Shift> getShifts() {
-    final possibleShifts = widget.shiftList.shifts
-        .where((element) =>
-            element.allDay == false &&
-            widget.preferences.rotaUnhidden(element.rota) == true)
-        .toList()
-      ..sort((a, b) {
-        final result = a.start.compareTo(b.start);
-        if (result == 0) {
-          if (a.rota.name.startsWith('Leader')) {
-            return -1;
-          }
-          return b.rota.name.compareTo(a.rota.name);
-        }
-        return result;
-      });
+    final now = DateTime.now();
     if (widget.shiftView == ShiftViews.relevant) {
-      final now = DateTime.now();
+      final possibleShifts = widget.shiftList.shifts
+          .where((element) =>
+              element.allDay == false &&
+              widget.preferences.rotaUnhidden(element.rota) == true)
+          .toList()
+        ..sort(compareShiftNames);
       final shifts = widget.shiftList.shifts
           .where((element) =>
               element.allDay == true &&
@@ -115,8 +123,15 @@ class _ShiftsViewState extends State<ShiftsView> {
       }
       return shifts;
     }
-    return widget.shiftList.shifts
-        .where((element) => widget.preferences.rotaUnhidden(element.rota))
-        .toList();
+    return [
+      ...widget.shiftList.shifts.where((element) =>
+          element.allDay == true &&
+          widget.preferences.rotaUnhidden(element.rota) &&
+          isOnSameDayAs(dateTime: element.start, origin: now)),
+      ...widget.shiftList.shifts.where((element) =>
+          element.allDay == false &&
+          widget.preferences.rotaUnhidden(element.rota) &&
+          isOnSameDayAs(dateTime: element.start, origin: now))
+    ]..sort(compareShiftNames);
   }
 }
