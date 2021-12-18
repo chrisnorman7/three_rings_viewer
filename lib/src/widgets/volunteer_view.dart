@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../enumerations.dart';
 import '../json/directory_volunteer.dart';
+import '../navigation_tab.dart';
 import '../util.dart';
 import 'cancellable_widget.dart';
 
@@ -41,6 +42,18 @@ class _VolunteerViewState extends State<VolunteerView> {
   /// Build a widget.
   @override
   Widget build(BuildContext context) {
+    final tabs = [
+      const NavigationTab(icon: Icon(Icons.details_rounded), label: 'Details'),
+      NavigationTab(
+          icon: Image.network(
+            widget.volunteer.imageUrl,
+            headers: getHeaders(apiKey: widget.apiKey),
+          ),
+          label: 'Image'),
+      const NavigationTab(
+          icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
+      const NavigationTab(icon: Icon(Icons.more_rounded), label: 'More')
+    ];
     var title = widget.volunteer.name;
     if (widget.volunteer.isSupportPerson) {
       title += ' (Support Volunteer)';
@@ -162,31 +175,41 @@ class _VolunteerViewState extends State<VolunteerView> {
         break;
     }
     return CancellableWidget(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
-        body: child,
-        bottomNavigationBar: BottomNavigationBar(
-          items: [
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.details_rounded), label: 'Details'),
-            BottomNavigationBarItem(
-                icon: Image.network(
-                  widget.volunteer.imageUrl,
-                  headers: getHeaders(apiKey: widget.apiKey),
-                ),
-                label: 'Image'),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.more_rounded), label: 'More')
-          ],
-          currentIndex: _state.index,
-          onTap: (value) => setState(() {
-            _state = VolunteerViewStates.values
-                .firstWhere((element) => element.index == value);
-          }),
+      child: OrientationBuilder(
+        builder: (context, orientation) => Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+          ),
+          body: Row(children: [
+            Expanded(child: child),
+            const VerticalDivider(
+              width: 1,
+              thickness: 1,
+            ),
+            NavigationRail(
+              destinations: [
+                ...tabs.map((e) => NavigationRailDestination(
+                    icon: e.icon, label: Text(e.label)))
+              ],
+              selectedIndex: _state.index,
+              onDestinationSelected: (value) => setState(() => _state =
+                  VolunteerViewStates.values
+                      .firstWhere((element) => element.index == value)),
+            )
+          ]),
+          bottomNavigationBar: orientation == Orientation.portrait
+              ? BottomNavigationBar(
+                  items: [
+                    ...tabs.map((e) =>
+                        BottomNavigationBarItem(icon: e.icon, label: e.label))
+                  ],
+                  currentIndex: _state.index,
+                  onTap: (value) => setState(() {
+                    _state = VolunteerViewStates.values
+                        .firstWhere((element) => element.index == value);
+                  }),
+                )
+              : null,
         ),
       ),
     );

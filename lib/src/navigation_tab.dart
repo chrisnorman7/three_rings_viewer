@@ -7,7 +7,7 @@ class NavigationTab {
   const NavigationTab({required this.icon, required this.label});
 
   /// The icon to use.
-  final Icon icon;
+  final Widget icon;
 
   /// The label to use.
   final String label;
