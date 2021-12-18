@@ -62,10 +62,13 @@ class _NewsItemViewState extends State<NewsItemView> {
         }
         final url = match.group(1)!;
         final title = match.group(2)!;
-        children.add(TextSpan(
+        children.add(
+          TextSpan(
             text: title,
             style: linkStyle,
-            recognizer: TapGestureRecognizer()..onTap = () => launch(url)));
+            recognizer: TapGestureRecognizer()..onTap = () => launch(url),
+          ),
+        );
         lastEnd = match.end;
       }
       children.add(const TextSpan(text: '\n', style: normalStyle));
