@@ -34,14 +34,21 @@ class _NewsViewState extends State<NewsView> {
     return ListView.builder(
       itemBuilder: (context, index) {
         final newsItem = newsItems[index];
+        final title =
+            Text(newsItem.title + (newsItem.sticky ? ' (Sticky)' : ''));
         return ListTile(
-          title: Text(newsItem.title + (newsItem.sticky ? ' (Sticky)' : '')),
-          subtitle: Image.network(
+          leading: Image.network(
             getImageUrl(newsItem.creator.id),
             headers: getHeaders(apiKey: widget.apiKey),
             semanticLabel: newsItem.creator.name,
           ),
-          trailing: Text(prettyDate(newsItem.createdAt)),
+          title: newsItem.sticky
+              ? Container(
+                  child: title,
+                  decoration: const BoxDecoration(color: Colors.yellow),
+                )
+              : title,
+          subtitle: Text(prettyDate(newsItem.createdAt)),
           onTap: () =>
               Navigator.of(context).push(MaterialPageRoute<NewsItemView>(
             builder: (context) =>
