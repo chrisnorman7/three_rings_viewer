@@ -102,9 +102,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
                                 } else {
                                   final volunteer =
                                       LoadedVolunteer.fromJson(json).volunteer;
-                                  return VolunteerView(
-                                      volunteer: volunteer,
-                                      apiKey: widget.preferences.apiKey!);
+                                  return VolunteerView(volunteer: volunteer);
                                 }
                               },
                             ),

@@ -35,8 +35,7 @@ class _VolunteersViewState extends State<VolunteersView> {
             return IconButton(
               onPressed: () =>
                   Navigator.of(context).push(MaterialPageRoute<VolunteerView>(
-                builder: (context) =>
-                    VolunteerView(volunteer: volunteer, apiKey: widget.apiKey),
+                builder: (context) => VolunteerView(volunteer: volunteer),
               )),
               icon: Column(
                 children: [
