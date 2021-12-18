@@ -1,22 +1,32 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../constants.dart';
 import '../enumerations.dart';
 import '../json/directory_volunteer.dart';
+import '../json/volunteer_list.dart';
 import '../util.dart';
 import 'cancellable_widget.dart';
+import 'get_url_widget.dart';
+import 'home_page.dart';
 import 'oriented_scaffold.dart';
+import 'volunteers_view.dart';
 
 /// A widget to show volunteer details.
 class VolunteerView extends StatefulWidget {
   /// Create an instance.
-  const VolunteerView({required this.volunteer, Key? key}) : super(key: key);
+  const VolunteerView({required this.volunteer, required this.apiKey, Key? key})
+      : super(key: key);
 
   /// The volunteer to use.
   final DirectoryVolunteer volunteer;
+
+  /// The API key to use.
+  final String apiKey;
 
   /// Create state for this widget.
   @override
@@ -111,11 +121,51 @@ class _VolunteerViewState extends State<VolunteerView> {
         break;
       case VolunteerViewStates.roles:
         child = ListView.builder(
-          itemBuilder: (context, index) => Focus(
-            child: ListTile(
-              title: Text(widget.volunteer.roles[index].name),
-            ),
-          ),
+          itemBuilder: (context, index) {
+            final role = widget.volunteer.roles[index];
+            return ListTile(
+              title: Text(role.name),
+              onTap: () {
+                final url = '$baseUrl/directory/view_by_role/${role.id}.json';
+                final http = Dio(
+                    BaseOptions(headers: getHeaders(apiKey: widget.apiKey)));
+                final future = http.get<JsonType>(url);
+                Navigator.of(context).push(MaterialPageRoute<GetUrlWidget>(
+                  builder: (context) => GetUrlWidget(
+                      future: future,
+                      onLoad: (json) {
+                        final title = '${role.name} Volunteers';
+                        final appBar = AppBar(
+                          title: Text(title),
+                        );
+                        if (json == null) {
+                          return CancellableWidget(
+                            child: Scaffold(
+                              appBar: appBar,
+                              body: const Center(
+                                  child: Text('No volunteers to show.')),
+                            ),
+                          );
+                        }
+                        final volunteerList = VolunteerList.fromJson(json);
+                        final volunteers = volunteerList.volunteers;
+                        return CancellableWidget(
+                          child: Scaffold(
+                            appBar: appBar,
+                            body: volunteers == null
+                                ? const Center(
+                                    child: Text('No volunteers to show.'),
+                                  )
+                                : VolunteersView(
+                                    volunteers: volunteers,
+                                    apiKey: widget.apiKey),
+                          ),
+                        );
+                      }),
+                ));
+              },
+            );
+          },
           itemCount: widget.volunteer.roles.length,
         );
         break;
