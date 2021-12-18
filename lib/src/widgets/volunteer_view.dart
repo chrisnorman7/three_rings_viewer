@@ -12,14 +12,10 @@ import 'cancellable_widget.dart';
 /// A widget to show volunteer details.
 class VolunteerView extends StatefulWidget {
   /// Create an instance.
-  const VolunteerView({required this.volunteer, required this.apiKey, Key? key})
-      : super(key: key);
+  const VolunteerView({required this.volunteer, Key? key}) : super(key: key);
 
   /// The volunteer to use.
   final DirectoryVolunteer volunteer;
-
-  /// The API key to use to get images.
-  final String apiKey;
 
   /// Create state for this widget.
   @override
@@ -112,16 +108,6 @@ class _VolunteerViewState extends State<VolunteerView> {
           itemCount: children.length,
         );
         break;
-      case VolunteerViewStates.image:
-        child = Image.network(
-          getImageUrl(widget.volunteer.id),
-          headers: getHeaders(apiKey: widget.apiKey),
-          semanticLabel: 'Image of ${widget.volunteer.name}.',
-          fit: BoxFit.cover,
-          height: double.infinity,
-          width: double.infinity,
-        );
-        break;
       case VolunteerViewStates.roles:
         child = ListView.builder(
           itemBuilder: (context, index) => Focus(
@@ -168,18 +154,12 @@ class _VolunteerViewState extends State<VolunteerView> {
         ),
         body: child,
         bottomNavigationBar: BottomNavigationBar(
-          items: [
-            const BottomNavigationBarItem(
+          items: const [
+            BottomNavigationBarItem(
                 icon: Icon(Icons.details_rounded), label: 'Details'),
             BottomNavigationBarItem(
-                icon: Image.network(
-                  getImageUrl(widget.volunteer.id),
-                  headers: getHeaders(apiKey: widget.apiKey),
-                ),
-                label: 'Image'),
-            const BottomNavigationBarItem(
                 icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
                 icon: Icon(Icons.more_rounded), label: 'More')
           ],
           currentIndex: _state.index,
