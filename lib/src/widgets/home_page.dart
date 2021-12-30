@@ -280,6 +280,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           throw UnimplementedError('Unsupported intent: $intent.');
         }
+        return null;
       },
     );
     final actions = <Widget>[];
