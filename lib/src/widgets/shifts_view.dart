@@ -69,6 +69,8 @@ class _ShiftsViewState extends State<ShiftsView> {
     if (a.start.isAtSameMomentAs(b.start) && a.end.isAtSameMomentAs(b.end)) {
       if (b.rota.name.toLowerCase().startsWith('leader')) {
         return 1;
+      } else if (a.rota.name.toLowerCase().startsWith('leader')) {
+        return -1;
       }
       return b.rota.name.toLowerCase().compareTo(a.rota.name.toLowerCase());
     }
