@@ -57,7 +57,9 @@ class _VolunteerViewState extends State<VolunteerView> {
       case VolunteerViewStates.details:
         final children = <Widget>[];
         for (final property in widget.volunteer.volunteerProperties) {
-          for (final datum in property.values) {
+          final propertyValues = property.values.toList();
+          for (var i = 0; i < propertyValues.length; i++) {
+            final datum = propertyValues[i];
             final propertyValue = datum.value;
             if (propertyValue == null) {
               continue;
@@ -68,49 +70,56 @@ class _VolunteerViewState extends State<VolunteerView> {
             final title = Text(propertyName);
             final value = Text(propertyValue);
             if (clickable) {
-              children.add(ListTile(
-                title: title,
-                subtitle: value,
-                onTap: () async {
-                  final String url;
-                  if (propertyName.startsWith('Email')) {
-                    url = 'mailto:$propertyValue';
-                  } else {
-                    // Must be a telephone number.
-                    final html = const HtmlEscape().convert(propertyValue);
-                    url = 'tel:$html';
-                  }
-                  try {
-                    if (await launch(url) == false) {
-                      throw MissingPluginException('Failed to open $url.');
+              children.add(
+                ListTile(
+                  autofocus: i == 0,
+                  title: title,
+                  subtitle: value,
+                  onTap: () async {
+                    final String url;
+                    if (propertyName.startsWith('Email')) {
+                      url = 'mailto:$propertyValue';
+                    } else {
+                      // Must be a telephone number.
+                      final html = const HtmlEscape().convert(propertyValue);
+                      url = 'tel:$html';
                     }
-                  } on MissingPluginException catch (e) {
-                    showDialog<AlertDialog>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        actions: [
-                          IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: const Icon(
-                                Icons.done_rounded,
-                                semanticLabel: 'OK',
-                              ))
-                        ],
-                        content: SingleChildScrollView(
-                          child: Text(e.message ?? 'Unknown error.'),
+                    try {
+                      if (await launch(url) == false) {
+                        throw MissingPluginException('Failed to open $url.');
+                      }
+                    } on MissingPluginException catch (e) {
+                      showDialog<AlertDialog>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          actions: [
+                            IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: const Icon(
+                                  Icons.done_rounded,
+                                  semanticLabel: 'OK',
+                                ))
+                          ],
+                          content: SingleChildScrollView(
+                            child: Text(e.message ?? 'Unknown error.'),
+                          ),
+                          title: const Text('URL Error'),
                         ),
-                        title: const Text('URL Error'),
-                      ),
-                    );
-                  }
-                },
-              ));
+                      );
+                    }
+                  },
+                ),
+              );
             } else {
-              children.add(Focus(
+              children.add(
+                Focus(
                   child: ListTile(
-                title: title,
-                subtitle: value,
-              )));
+                    autofocus: i == 0,
+                    title: title,
+                    subtitle: value,
+                  ),
+                ),
+              );
             }
           }
         }
@@ -124,6 +133,7 @@ class _VolunteerViewState extends State<VolunteerView> {
           itemBuilder: (context, index) {
             final role = widget.volunteer.roles[index];
             return ListTile(
+              autofocus: index == 0,
               title: Text(role.name),
               onTap: () {
                 final url = '$baseUrl/directory/view_by_role/${role.id}.json';
@@ -173,6 +183,7 @@ class _VolunteerViewState extends State<VolunteerView> {
         child = ListView(
           children: [
             Focus(
+              autofocus: true,
               child: ListTile(
                 title: const Text('Member Since'),
                 subtitle: Text(prettyDate(widget.volunteer.createdAt)),
@@ -185,15 +196,17 @@ class _VolunteerViewState extends State<VolunteerView> {
               ),
             ),
             Focus(
-                child: ListTile(
-              title: const Text('Updated At'),
-              subtitle: Text(prettyDate(widget.volunteer.updatedAt)),
-            )),
+              child: ListTile(
+                title: const Text('Updated At'),
+                subtitle: Text(prettyDate(widget.volunteer.updatedAt)),
+              ),
+            ),
             Focus(
-                child: ListTile(
-              title: const Text('Updated By'),
-              subtitle: Text(widget.volunteer.updater.name),
-            )),
+              child: ListTile(
+                title: const Text('Updated By'),
+                subtitle: Text(widget.volunteer.updater.name),
+              ),
+            ),
           ],
         );
         break;

@@ -34,9 +34,11 @@ class _NewsViewState extends State<NewsView> {
     return ListView.builder(
       itemBuilder: (context, index) {
         final newsItem = newsItems[index];
-        final title =
-            Text(newsItem.title + (newsItem.sticky ? ' (Sticky)' : ''));
+        final title = Text(
+          newsItem.title + (newsItem.sticky ? ' (Sticky)' : ''),
+        );
         return ListTile(
+          autofocus: index == 0,
           leading: Image.network(
             getImageUrl(newsItem.creator.id),
             headers: getHeaders(apiKey: widget.apiKey),

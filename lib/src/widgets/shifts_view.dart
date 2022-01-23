@@ -42,14 +42,16 @@ class _ShiftsViewState extends State<ShiftsView> {
         itemBuilder: (context, index) {
           final shift = shifts[index];
           return ListTile(
+            autofocus: index == 0,
             title: Text(shift.rota.name),
-            subtitle: Text(shift.allDay
-                ? 'All day'
-                : '${timestamp(shift.start)} - '
-                    '${timestamp(shift.end)}'),
+            subtitle: Text(
+              shift.allDay
+                  ? 'All day'
+                  : '${timestamp(shift.start)} - '
+                      '${timestamp(shift.end)}',
+            ),
             onTap: () async {
-              await Navigator.of(context)
-                  .push<ShiftVolunteersView>(MaterialPageRoute(
+              await Navigator.of(context).push(MaterialPageRoute<void>(
                 builder: (context) => ShiftVolunteersView(
                   shift: shift,
                   preferences: widget.preferences,

@@ -67,26 +67,33 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
             body: volunteers.isEmpty
                 ? const Focus(
                     child: Center(
-                    child: Text('This shift is empty.'),
-                  ))
+                      child: Text('This shift is empty.'),
+                    ),
+                  )
                 : ListView.builder(
                     itemBuilder: (context, index) {
                       final volunteer = volunteers[index];
                       return ListTile(
+                        autofocus: index == 0,
                         title: Text(volunteer.name),
                         subtitle: Image.network(
                           volunteer.imageUrl,
-                          headers:
-                              getHeaders(apiKey: widget.preferences.apiKey!),
+                          headers: getHeaders(
+                            apiKey: widget.preferences.apiKey!,
+                          ),
                         ),
                         onTap: () {
-                          final http = Dio(BaseOptions(
+                          final http = Dio(
+                            BaseOptions(
                               headers: getHeaders(
-                                  apiKey: widget.preferences.apiKey!)));
+                                apiKey: widget.preferences.apiKey!,
+                              ),
+                            ),
+                          );
                           final future = http.get<JsonType>(
-                              'https://www.3r.org.uk/directory/${volunteer.id}?format=json');
-                          Navigator.of(context)
-                              .push(MaterialPageRoute<GetUrlWidget>(
+                            'https://www.3r.org.uk/directory/${volunteer.id}?format=json',
+                          );
+                          Navigator.of(context).push(MaterialPageRoute<void>(
                             builder: (context) => GetUrlWidget(
                               future: future,
                               onLoad: (json) {
