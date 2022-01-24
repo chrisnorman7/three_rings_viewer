@@ -1,19 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'news_volunteer.dart';
+part of 'creator_volunteer.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-NewsVolunteer _$NewsVolunteerFromJson(Map<String, dynamic> json) =>
-    NewsVolunteer(
+CreatorVolunteer _$CreatorVolunteerFromJson(Map<String, dynamic> json) =>
+    CreatorVolunteer(
       id: json['id'] as int,
       name: json['name'] as String,
       username: json['username'] as String,
     );
 
-Map<String, dynamic> _$NewsVolunteerToJson(NewsVolunteer instance) =>
+Map<String, dynamic> _$CreatorVolunteerToJson(CreatorVolunteer instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

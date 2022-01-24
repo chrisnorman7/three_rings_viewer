@@ -1,7 +1,7 @@
 /// Provides the [NewsItem] class.
 import 'package:json_annotation/json_annotation.dart';
 
-import 'news_volunteer.dart';
+import 'creator_volunteer.dart';
 
 part 'news_item.g.dart';
 
@@ -67,10 +67,10 @@ class NewsItem {
   final String priority;
 
   /// The person who created this news item.
-  final NewsVolunteer creator;
+  final CreatorVolunteer creator;
 
   /// The person who updated this news item.
-  final NewsVolunteer updater;
+  final CreatorVolunteer updater;
 
   /// Convert an instance to JSON.
   Map<String, dynamic> toJson() => _$NewsItemToJson(this);

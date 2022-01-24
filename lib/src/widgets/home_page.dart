@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
 import '../enumerations.dart';
 import '../intents.dart';
+import '../json/event_list.dart';
 import '../json/news_list.dart';
 import '../json/preferences.dart';
 import '../json/rota.dart';
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   late final Future<SharedPreferences> _sharedPreferencesFuture;
 
   /// The page which should be shown.
-  late HomePageStates _states;
+  late HomePageStates _state;
 
   /// The loaded shift list.
   ShiftList? _shiftList;
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _shiftView = ShiftViews.relevant;
-    _states = HomePageStates.shifts;
+    _state = HomePageStates.shifts;
     _sharedPreferencesFuture = SharedPreferences.getInstance();
   }
 
@@ -125,7 +126,7 @@ class _HomePageState extends State<HomePage> {
       final options = BaseOptions(headers: getHeaders(apiKey: apiKey));
       final http = Dio(options);
       final now = DateTime.now();
-      switch (_states) {
+      switch (_state) {
         case HomePageStates.shifts:
           title = 'Shifts';
           final shiftList = _shiftList;
@@ -238,22 +239,23 @@ class _HomePageState extends State<HomePage> {
               now.difference(newsDownloaded) >= httpGetInterval) {
             final future = http.get<JsonType>('$baseUrl/news.json');
             child = GetUrlWidget(
-                future: future,
-                onLoad: (json) {
-                  if (json == null) {
-                    return const Focus(
-                        child: Center(
-                      child: Text('No news items to show.'),
-                    ));
-                  }
-                  final newsList = NewsList.fromJson(json);
-                  _newsList = newsList;
-                  _newsDownloaded = now;
-                  return NewsView(
-                    newsList: newsList,
-                    apiKey: apiKey,
-                  );
-                });
+              future: future,
+              onLoad: (json) {
+                if (json == null) {
+                  return const Focus(
+                      child: Center(
+                    child: Text('No news items to show.'),
+                  ));
+                }
+                final newsList = NewsList.fromJson(json);
+                _newsList = newsList;
+                _newsDownloaded = now;
+                return NewsView(
+                  newsList: newsList,
+                  apiKey: apiKey,
+                );
+              },
+            );
           } else {
             child = NewsView(
               newsList: newsList,
@@ -261,21 +263,61 @@ class _HomePageState extends State<HomePage> {
             );
           }
           break;
+        case HomePageStates.events:
+          title = 'Events';
+          final future = http.get<JsonType>('$baseUrl/events.json');
+          child = GetUrlWidget(
+            future: future,
+            onLoad: (json) {
+              if (json == null) {
+                return const Focus(
+                  child: Center(
+                    child: Text('There are no events to show.'),
+                  ),
+                );
+              }
+              final eventList = EventList.fromJson(json);
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  final event = eventList.events[index];
+                  final isThreeLine = event.description.isNotEmpty;
+                  final date = event.date;
+                  final day = padNumber(date.day);
+                  final month = padNumber(date.month);
+                  final year = date.year;
+                  return ListTile(
+                    autofocus: index == 0,
+                    title: Text('$day/$month/$year'),
+                    subtitle: Text(event.name),
+                    isThreeLine: isThreeLine,
+                    trailing: isThreeLine ? Text(event.description) : null,
+                    onTap: () {},
+                  );
+                },
+                itemCount: eventList.events.length,
+              );
+            },
+          );
+          break;
       }
     }
     final tabCallback = CallbackAction(
       onInvoke: (intent) {
         if (intent is ShiftsTabIntent) {
           setState(() {
-            _states = HomePageStates.shifts;
+            _state = HomePageStates.shifts;
           });
         } else if (intent is VolunteersTabIntent) {
           setState(() {
-            _states = HomePageStates.volunteers;
+            _state = HomePageStates.volunteers;
           });
         } else if (intent is NewsTabIntent) {
           setState(() {
-            _states = HomePageStates.news;
+            _state = HomePageStates.news;
+          });
+        } else if (intent is EventsTabIntent) {
+          setState(() {
+            _state = HomePageStates.events;
           });
         } else {
           throw UnimplementedError('Unsupported intent: $intent.');
@@ -284,7 +326,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
     final actions = <Widget>[];
-    if (_states == HomePageStates.shifts) {
+    if (_state == HomePageStates.shifts) {
       if (preferences.ignoredRotas.isNotEmpty) {
         actions.add(PopupMenuButton<Rota>(
             itemBuilder: (context) => [
@@ -313,48 +355,58 @@ class _HomePageState extends State<HomePage> {
               _shiftView == ShiftViews.relevant ? 'All Day' : 'Relevant')));
     }
     return Shortcuts(
-        shortcuts: const {
-          SingleActivator(LogicalKeyboardKey.digit1, control: true):
-              ShiftsTabIntent(),
-          SingleActivator(LogicalKeyboardKey.digit2, control: true):
-              VolunteersTabIntent(),
-          SingleActivator(LogicalKeyboardKey.digit3, control: true):
-              NewsTabIntent()
+      shortcuts: const {
+        SingleActivator(LogicalKeyboardKey.digit1, control: true):
+            ShiftsTabIntent(),
+        SingleActivator(LogicalKeyboardKey.digit2, control: true):
+            VolunteersTabIntent(),
+        SingleActivator(LogicalKeyboardKey.digit3, control: true):
+            NewsTabIntent(),
+        SingleActivator(LogicalKeyboardKey.digit4, control: true):
+            EventsTabIntent()
+      },
+      child: Actions(
+        actions: {
+          ShiftsTabIntent: tabCallback,
+          VolunteersTabIntent: tabCallback,
+          NewsTabIntent: tabCallback,
+          EventsTabIntent: tabCallback,
         },
-        child: Actions(
-            actions: {
-              ShiftsTabIntent: tabCallback,
-              VolunteersTabIntent: tabCallback,
-              NewsTabIntent: tabCallback
-            },
-            child: OrientedScaffold(
-              appBar: AppBar(
-                leading: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushReplacementNamed(
-                      ApiKeyForm.routeName,
-                      arguments: preferences),
-                  child: Icon(
-                    Icons.settings,
-                    semanticLabel:
-                        '${apiKey == null ? "Enter" : "Change"} API key',
-                  ),
-                ),
-                title: Text(title),
-                actions: actions,
+        child: OrientedScaffold(
+          appBar: AppBar(
+            leading: ElevatedButton(
+              onPressed: () => Navigator.of(context).pushReplacementNamed(
+                  ApiKeyForm.routeName,
+                  arguments: preferences),
+              child: Icon(
+                Icons.settings,
+                semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
               ),
-              tabs: const [
-                OrientedScaffoldTab(
-                    icon: Icon(Icons.calendar_today_rounded), label: 'Shifts'),
-                OrientedScaffoldTab(
-                    icon: Icon(Icons.people_rounded), label: 'Volunteers'),
-                OrientedScaffoldTab(
-                    icon: Icon(Icons.info_rounded), label: 'News')
-              ],
-              child: child,
-              onNavigate: (value) => setState(() => _states = HomePageStates
-                  .values
-                  .firstWhere((element) => element.index == value)),
-              selectedIndex: _states.index,
-            )));
+            ),
+            title: Text(title),
+            actions: actions,
+          ),
+          tabs: const [
+            OrientedScaffoldTab(
+              icon: Icon(Icons.calendar_today_rounded),
+              label: 'Shifts',
+            ),
+            OrientedScaffoldTab(
+              icon: Icon(Icons.people_rounded),
+              label: 'Volunteers',
+            ),
+            OrientedScaffoldTab(icon: Icon(Icons.info_rounded), label: 'News'),
+            OrientedScaffoldTab(
+              icon: Icon(Icons.schedule_rounded),
+              label: 'Events',
+            ),
+          ],
+          child: child,
+          onNavigate: (value) => setState(() => _state = HomePageStates.values
+              .firstWhere((element) => element.index == value)),
+          selectedIndex: _state.index,
+        ),
+      ),
+    );
   }
 }

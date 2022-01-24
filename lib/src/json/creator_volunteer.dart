@@ -1,20 +1,20 @@
-/// Provides the [NewsVolunteer] class.
+/// Provides the [CreatorVolunteer] class.
 import 'package:json_annotation/json_annotation.dart';
 
 import 'news_item.dart';
 
-part 'news_volunteer.g.dart';
+part 'creator_volunteer.g.dart';
 
 /// The volunteer who created a [NewsItem].
 @JsonSerializable()
-class NewsVolunteer {
+class CreatorVolunteer {
   /// Create an instance.
-  const NewsVolunteer(
+  const CreatorVolunteer(
       {required this.id, required this.name, required this.username});
 
   /// Create an instance from a JSON object.
-  factory NewsVolunteer.fromJson(Map<String, dynamic> json) =>
-      _$NewsVolunteerFromJson(json);
+  factory CreatorVolunteer.fromJson(Map<String, dynamic> json) =>
+      _$CreatorVolunteerFromJson(json);
 
   /// The ID of this user.
   final int id;
@@ -26,5 +26,5 @@ class NewsVolunteer {
   final String username;
 
   /// Convert an instance to JSON.
-  Map<String, dynamic> toJson() => _$NewsVolunteerToJson(this);
+  Map<String, dynamic> toJson() => _$CreatorVolunteerToJson(this);
 }

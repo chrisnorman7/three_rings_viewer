@@ -22,8 +22,10 @@ NewsItem _$NewsItemFromJson(Map<String, dynamic> json) => NewsItem(
       expiresAt: DateTime.parse(json['expires_at'] as String),
       sticky: json['sticky'] as bool,
       priority: json['priority'] as String,
-      creator: NewsVolunteer.fromJson(json['creator'] as Map<String, dynamic>),
-      updater: NewsVolunteer.fromJson(json['updater'] as Map<String, dynamic>),
+      creator:
+          CreatorVolunteer.fromJson(json['creator'] as Map<String, dynamic>),
+      updater:
+          CreatorVolunteer.fromJson(json['updater'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$NewsItemToJson(NewsItem instance) => <String, dynamic>{

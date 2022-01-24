@@ -12,6 +12,9 @@ enum HomePageStates {
 
   /// The news view.
   news,
+
+  /// The events view.
+  events,
 }
 
 /// States for [VolunteerView].

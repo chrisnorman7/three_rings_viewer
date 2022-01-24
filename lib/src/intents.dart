@@ -25,6 +25,12 @@ class NewsTabIntent extends Intent {
   const NewsTabIntent();
 }
 
+/// Navigate to the events tab.
+class EventsTabIntent extends Intent {
+  /// Create an instance.
+  const EventsTabIntent();
+}
+
 /// Hide or unhide a shift.
 class HideUnhideShiftIntent extends Intent {
   /// Create an instance.
