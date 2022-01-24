@@ -32,7 +32,5 @@ String prettyDate(DateTime dateTime) {
 /// Return a number padded with 0's.
 String padNumber(int n) => n.toString().padLeft(2, '0');
 
-/// Get the URL to the image of a volunteer with the given [id].
-
 /// The URL to the image of this volunteer.
 String getImageUrl(int id) => '$baseUrl/directory/$id/photos/thumb.jpg';
