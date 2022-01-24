@@ -53,16 +53,10 @@ class _NewsItemViewState extends State<NewsItemView> {
                     final headers = getHeaders(apiKey: widget.apiKey);
                     return Image.network(
                       src,
-                      errorBuilder: (context, error, stackTrace) {
-                        print('Failed to load $alt ($src).');
-                        print('Headers: $headers');
-                        print(error);
-                        print(stackTrace);
-                        return Icon(
-                          Icons.image_not_supported_rounded,
-                          semanticLabel: alt,
-                        );
-                      },
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.image_not_supported_rounded,
+                        semanticLabel: alt,
+                      ),
                       headers: headers,
                       height: double.tryParse(attributes['height'] ?? ''),
                       semanticLabel: alt,
