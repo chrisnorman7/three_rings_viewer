@@ -14,6 +14,8 @@ import '../json/shift_list.dart';
 import '../json/volunteer_list.dart';
 import '../util.dart';
 import 'api_key_form.dart';
+import 'events_view.dart';
+import 'get_text.dart';
 import 'get_url_widget.dart';
 import 'news_view.dart';
 import 'oriented_scaffold.dart';
@@ -64,6 +66,12 @@ class _HomePageState extends State<HomePage> {
 
   /// The last time the news was downloaded.
   DateTime? _newsDownloaded;
+
+  /// The last event list.
+  EventList? _eventList;
+
+  /// When the news was last downloaded.
+  DateTime? _eventsDownloaded;
 
   /// Start [_sharedPreferencesFuture] running.
   @override
@@ -181,7 +189,7 @@ class _HomePageState extends State<HomePage> {
               future: future,
               onLoad: (json) {
                 if (json == null) {
-                  return const Center(child: Text('No shifts to show.'));
+                  return const CenterText(text: 'No shifts to show.');
                 }
                 final shiftList = ShiftList.fromJson(json);
                 _shiftList = shiftList;
@@ -213,9 +221,7 @@ class _HomePageState extends State<HomePage> {
               future: future,
               onLoad: (json) {
                 if (json == null) {
-                  return const Center(
-                    child: Text('No volunteers to show.'),
-                  );
+                  return const CenterText(text: 'No volunteers to show.');
                 }
                 _volunteersDownloaded = now;
                 final volunteerList = VolunteerList.fromJson(json);
@@ -242,10 +248,7 @@ class _HomePageState extends State<HomePage> {
               future: future,
               onLoad: (json) {
                 if (json == null) {
-                  return const Focus(
-                      child: Center(
-                    child: Text('No news items to show.'),
-                  ));
+                  return const CenterText(text: 'No news items to show.');
                 }
                 final newsList = NewsList.fromJson(json);
                 _newsList = newsList;
@@ -265,39 +268,27 @@ class _HomePageState extends State<HomePage> {
           break;
         case HomePageStates.events:
           title = 'Events';
-          final future = http.get<JsonType>('$baseUrl/events.json');
-          child = GetUrlWidget(
-            future: future,
-            onLoad: (json) {
-              if (json == null) {
-                return const Focus(
-                  child: Center(
-                    child: Text('There are no events to show.'),
-                  ),
-                );
-              }
-              final eventList = EventList.fromJson(json);
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  final event = eventList.events[index];
-                  final isThreeLine = event.description.isNotEmpty;
-                  final date = event.date;
-                  final day = padNumber(date.day);
-                  final month = padNumber(date.month);
-                  final year = date.year;
-                  return ListTile(
-                    autofocus: index == 0,
-                    title: Text('$day/$month/$year'),
-                    subtitle: Text(event.name),
-                    isThreeLine: isThreeLine,
-                    trailing: isThreeLine ? Text(event.description) : null,
-                    onTap: () {},
-                  );
-                },
-                itemCount: eventList.events.length,
-              );
-            },
-          );
+          final events = _eventList;
+          final eventsDownloaded = _eventsDownloaded;
+          if (events == null ||
+              eventsDownloaded == null ||
+              now.difference(eventsDownloaded) >= httpGetInterval) {
+            final future = http.get<JsonType>('$baseUrl/events.json');
+            child = GetUrlWidget(
+              future: future,
+              onLoad: (json) {
+                if (json == null) {
+                  return const CenterText(text: 'No events to show.');
+                }
+                _eventsDownloaded = now;
+                final eventList = EventList.fromJson(json);
+                _eventList = eventList;
+                return EventsView(eventList: eventList);
+              },
+            );
+          } else {
+            child = EventsView(eventList: events);
+          }
           break;
       }
     }
