@@ -29,7 +29,8 @@ class _VolunteersViewState extends State<VolunteersView> {
   Widget build(BuildContext context) => OrientationBuilder(
         builder: (context, orientation) => GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: orientation == Orientation.portrait ? 4 : 5),
+            crossAxisCount: orientation == Orientation.portrait ? 4 : 5,
+          ),
           itemBuilder: (context, index) {
             final volunteer = widget.volunteers[index];
             return IconButton(
