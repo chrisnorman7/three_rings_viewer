@@ -28,18 +28,18 @@ typedef JsonType = Map<String, dynamic>;
 /// The home page widget.
 class HomePage extends StatefulWidget {
   /// Create an instance.
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({final Key? key}) : super(key: key);
 
   /// The route name.
   static const routeName = '/';
 
   /// Create state for this widget.
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
 /// State for [HomePage].
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   /// The future that will load the app preferences.
   late final Future<SharedPreferences> _sharedPreferencesFuture;
 
@@ -84,25 +84,29 @@ class _HomePageState extends State<HomePage> {
 
   /// Build a widget.
   @override
-  Widget build(BuildContext context) => FutureBuilder<SharedPreferences>(
-        builder: (context, snapshot) {
+  Widget build(final BuildContext context) => FutureBuilder<SharedPreferences>(
+        builder: (final context, final snapshot) {
           if (snapshot.hasData) {
             final preferences =
                 Preferences.fromSharedPreferences(snapshot.requireData);
             return getHomePage(
-                preferences: preferences,
-                sharedPreferences: snapshot.requireData);
+              preferences: preferences,
+              sharedPreferences: snapshot.requireData,
+            );
           } else if (snapshot.hasError) {
             return Scaffold(
               appBar: AppBar(title: const Text('Error')),
               body: Focus(
-                  child: RichText(
-                text: TextSpan(children: [
-                  TextSpan(text: snapshot.error.toString()),
-                  const TextSpan(text: '\n'),
-                  TextSpan(text: snapshot.stackTrace.toString())
-                ]),
-              )),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(text: snapshot.error.toString()),
+                      const TextSpan(text: '\n'),
+                      TextSpan(text: snapshot.stackTrace.toString())
+                    ],
+                  ),
+                ),
+              ),
             );
           } else {
             return Scaffold(
@@ -119,9 +123,10 @@ class _HomePageState extends State<HomePage> {
       );
 
   /// Get the main home page.
-  Widget getHomePage(
-      {required Preferences preferences,
-      required SharedPreferences sharedPreferences}) {
+  Widget getHomePage({
+    required final Preferences preferences,
+    required final SharedPreferences sharedPreferences,
+  }) {
     final Widget child;
     final String title;
     final apiKey = preferences.apiKey;
@@ -187,7 +192,7 @@ class _HomePageState extends State<HomePage> {
             );
             child = GetUrlWidget(
               future: future,
-              onLoad: (json) {
+              onLoad: (final json) {
                 if (json == null) {
                   return const CenterText(text: 'No shifts to show.');
                 }
@@ -219,7 +224,7 @@ class _HomePageState extends State<HomePage> {
             final future = http.get<JsonType>('$baseUrl/directory.json');
             child = GetUrlWidget(
               future: future,
-              onLoad: (json) {
+              onLoad: (final json) {
                 if (json == null) {
                   return const CenterText(text: 'No volunteers to show.');
                 }
@@ -246,7 +251,7 @@ class _HomePageState extends State<HomePage> {
             final future = http.get<JsonType>('$baseUrl/news.json');
             child = GetUrlWidget(
               future: future,
-              onLoad: (json) {
+              onLoad: (final json) {
                 if (json == null) {
                   return const CenterText(text: 'No news items to show.');
                 }
@@ -276,7 +281,7 @@ class _HomePageState extends State<HomePage> {
             final future = http.get<JsonType>('$baseUrl/events.json');
             child = GetUrlWidget(
               future: future,
-              onLoad: (json) {
+              onLoad: (final json) {
                 if (json == null) {
                   return const CenterText(text: 'No events to show.');
                 }
@@ -293,7 +298,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
     final tabCallback = CallbackAction(
-      onInvoke: (intent) {
+      onInvoke: (final intent) {
         if (intent is ShiftsTabIntent) {
           setState(() {
             _state = HomePageStates.shifts;
@@ -319,31 +324,38 @@ class _HomePageState extends State<HomePage> {
     final actions = <Widget>[];
     if (_state == HomePageStates.shifts) {
       if (preferences.ignoredRotas.isNotEmpty) {
-        actions.add(PopupMenuButton<Rota>(
-            itemBuilder: (context) => [
-                  for (final rota in preferences.ignoredRotas)
-                    PopupMenuItem(
-                      child: Text(rota.name),
-                      value: rota,
-                    ),
-                ],
+        actions.add(
+          PopupMenuButton<Rota>(
+            itemBuilder: (final context) => [
+              for (final rota in preferences.ignoredRotas)
+                PopupMenuItem(
+                  value: rota,
+                  child: Text(rota.name),
+                ),
+            ],
             child: const Text('Unhide Shifts'),
-            onSelected: (value) => setState(() {
-                  preferences.ignoredRotas
-                      .removeWhere((element) => element.id == value.id);
-                  preferences.save(sharedPreferences);
-                })));
+            onSelected: (final value) => setState(() {
+              preferences.ignoredRotas
+                  .removeWhere((final element) => element.id == value.id);
+              preferences.save(sharedPreferences);
+            }),
+          ),
+        );
       }
-      actions.add(ElevatedButton(
+      actions.add(
+        ElevatedButton(
           onPressed: () => setState(() {
-                _shiftList = null;
-                _shiftsDownloaded = null;
-                _shiftView = (_shiftView == ShiftViews.relevant)
-                    ? ShiftViews.today
-                    : ShiftViews.relevant;
-              }),
+            _shiftList = null;
+            _shiftsDownloaded = null;
+            _shiftView = (_shiftView == ShiftViews.relevant)
+                ? ShiftViews.today
+                : ShiftViews.relevant;
+          }),
           child: Text(
-              _shiftView == ShiftViews.relevant ? 'All Day' : 'Relevant')));
+            _shiftView == ShiftViews.relevant ? 'All Day' : 'Relevant',
+          ),
+        ),
+      );
     }
     return Shortcuts(
       shortcuts: const {
@@ -367,8 +379,9 @@ class _HomePageState extends State<HomePage> {
           appBar: AppBar(
             leading: ElevatedButton(
               onPressed: () => Navigator.of(context).pushReplacementNamed(
-                  ApiKeyForm.routeName,
-                  arguments: preferences),
+                ApiKeyForm.routeName,
+                arguments: preferences,
+              ),
               child: Icon(
                 Icons.settings,
                 semanticLabel: '${apiKey == null ? "Enter" : "Change"} API key',
@@ -392,10 +405,12 @@ class _HomePageState extends State<HomePage> {
               label: 'Events',
             ),
           ],
-          child: child,
-          onNavigate: (value) => setState(() => _state = HomePageStates.values
-              .firstWhere((element) => element.index == value)),
+          onNavigate: (final value) => setState(
+            () => _state = HomePageStates.values
+                .firstWhere((final element) => element.index == value),
+          ),
           selectedIndex: _state.index,
+          child: child,
         ),
       ),
     );

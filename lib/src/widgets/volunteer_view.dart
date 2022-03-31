@@ -19,8 +19,11 @@ import 'volunteers_view.dart';
 /// A widget to show volunteer details.
 class VolunteerView extends StatefulWidget {
   /// Create an instance.
-  const VolunteerView({required this.volunteer, required this.apiKey, Key? key})
-      : super(key: key);
+  const VolunteerView({
+    required this.volunteer,
+    required this.apiKey,
+    final Key? key,
+  }) : super(key: key);
 
   /// The volunteer to use.
   final DirectoryVolunteer volunteer;
@@ -30,11 +33,11 @@ class VolunteerView extends StatefulWidget {
 
   /// Create state for this widget.
   @override
-  _VolunteerViewState createState() => _VolunteerViewState();
+  VolunteerViewState createState() => VolunteerViewState();
 }
 
 /// State for [VolunteerView].
-class _VolunteerViewState extends State<VolunteerView> {
+class VolunteerViewState extends State<VolunteerView> {
   /// The state of this page.
   late VolunteerViewStates _state;
 
@@ -47,7 +50,7 @@ class _VolunteerViewState extends State<VolunteerView> {
 
   /// Build a widget.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     var title = widget.volunteer.name;
     if (widget.volunteer.isSupportPerson) {
       title += ' (Support Volunteer)';
@@ -89,16 +92,17 @@ class _VolunteerViewState extends State<VolunteerView> {
                         throw MissingPluginException('Failed to open $url.');
                       }
                     } on MissingPluginException catch (e) {
-                      showDialog<AlertDialog>(
+                      await showDialog<AlertDialog>(
                         context: context,
-                        builder: (context) => AlertDialog(
+                        builder: (final context) => AlertDialog(
                           actions: [
                             IconButton(
-                                onPressed: () => Navigator.pop(context),
-                                icon: const Icon(
-                                  Icons.done_rounded,
-                                  semanticLabel: 'OK',
-                                ))
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.done_rounded,
+                                semanticLabel: 'OK',
+                              ),
+                            )
                           ],
                           content: SingleChildScrollView(
                             child: Text(e.message ?? 'Unknown error.'),
@@ -124,13 +128,13 @@ class _VolunteerViewState extends State<VolunteerView> {
           }
         }
         child = ListView.builder(
-          itemBuilder: (context, index) => children[index],
+          itemBuilder: (final context, final index) => children[index],
           itemCount: children.length,
         );
         break;
       case VolunteerViewStates.roles:
         child = ListView.builder(
-          itemBuilder: (context, index) {
+          itemBuilder: (final context, final index) {
             final role = widget.volunteer.roles[index];
             return ListTile(
               autofocus: index == 0,
@@ -138,12 +142,14 @@ class _VolunteerViewState extends State<VolunteerView> {
               onTap: () {
                 final url = '$baseUrl/directory/view_by_role/${role.id}.json';
                 final http = Dio(
-                    BaseOptions(headers: getHeaders(apiKey: widget.apiKey)));
+                  BaseOptions(headers: getHeaders(apiKey: widget.apiKey)),
+                );
                 final future = http.get<JsonType>(url);
-                Navigator.of(context).push(MaterialPageRoute<GetUrlWidget>(
-                  builder: (context) => GetUrlWidget(
+                Navigator.of(context).push(
+                  MaterialPageRoute<GetUrlWidget>(
+                    builder: (final context) => GetUrlWidget(
                       future: future,
-                      onLoad: (json) {
+                      onLoad: (final json) {
                         final title = '${role.name} Volunteers';
                         final appBar = AppBar(
                           title: Text(title),
@@ -153,7 +159,8 @@ class _VolunteerViewState extends State<VolunteerView> {
                             child: Scaffold(
                               appBar: appBar,
                               body: const Center(
-                                  child: Text('No volunteers to show.')),
+                                child: Text('No volunteers to show.'),
+                              ),
                             ),
                           );
                         }
@@ -168,11 +175,14 @@ class _VolunteerViewState extends State<VolunteerView> {
                                   )
                                 : VolunteersView(
                                     volunteers: volunteers,
-                                    apiKey: widget.apiKey),
+                                    apiKey: widget.apiKey,
+                                  ),
                           ),
                         );
-                      }),
-                ));
+                      },
+                    ),
+                  ),
+                );
               },
             );
           },
@@ -216,19 +226,23 @@ class _VolunteerViewState extends State<VolunteerView> {
         appBar: AppBar(
           title: Text(title),
         ),
-        child: child,
         tabs: const [
           OrientedScaffoldTab(
-              icon: Icon(Icons.details_rounded), label: 'Details'),
+            icon: Icon(Icons.details_rounded),
+            label: 'Details',
+          ),
           OrientedScaffoldTab(
-              icon: Icon(Icons.access_alarms_rounded), label: 'Roles'),
+            icon: Icon(Icons.access_alarms_rounded),
+            label: 'Roles',
+          ),
           OrientedScaffoldTab(icon: Icon(Icons.more_rounded), label: 'More')
         ],
         selectedIndex: _state.index,
-        onNavigate: (value) => setState(
+        onNavigate: (final value) => setState(
           () => _state = VolunteerViewStates.values
-              .firstWhere((element) => element.index == value),
+              .firstWhere((final element) => element.index == value),
         ),
+        child: child,
       ),
     );
   }

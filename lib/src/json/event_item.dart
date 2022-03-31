@@ -15,7 +15,7 @@ class EventItem {
   });
 
   /// Create an instance from a JSON object.
-  factory EventItem.fromJson(Map<String, dynamic> json) =>
+  factory EventItem.fromJson(final Map<String, dynamic> json) =>
       _$EventItemFromJson(json);
 
   /// The name of the event.

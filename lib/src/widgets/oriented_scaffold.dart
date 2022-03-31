@@ -17,14 +17,14 @@ class OrientedScaffoldTab {
 /// a [NavigationRail] in landscape.
 class OrientedScaffold extends StatefulWidget {
   /// Create an instance.
-  const OrientedScaffold(
-      {required this.appBar,
-      required this.child,
-      required this.tabs,
-      required this.selectedIndex,
-      required this.onNavigate,
-      Key? key})
-      : super(key: key);
+  const OrientedScaffold({
+    required this.appBar,
+    required this.child,
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onNavigate,
+    final Key? key,
+  }) : super(key: key);
 
   /// The app bar to use.
   final AppBar appBar;
@@ -43,15 +43,15 @@ class OrientedScaffold extends StatefulWidget {
 
   /// Create state for this widget.
   @override
-  _OrientedScaffoldState createState() => _OrientedScaffoldState();
+  OrientedScaffoldState createState() => OrientedScaffoldState();
 }
 
 /// State for [OrientedScaffold].
-class _OrientedScaffoldState extends State<OrientedScaffold> {
+class OrientedScaffoldState extends State<OrientedScaffold> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) => OrientationBuilder(
-        builder: (context, orientation) => Scaffold(
+  Widget build(final BuildContext context) => OrientationBuilder(
+        builder: (final context, final orientation) => Scaffold(
           appBar: widget.appBar,
           body: orientation == Orientation.portrait
               ? widget.child
@@ -64,8 +64,12 @@ class _OrientedScaffoldState extends State<OrientedScaffold> {
                     ),
                     NavigationRail(
                       destinations: widget.tabs
-                          .map((e) => NavigationRailDestination(
-                              icon: e.icon, label: Text(e.label)))
+                          .map(
+                            (final e) => NavigationRailDestination(
+                              icon: e.icon,
+                              label: Text(e.label),
+                            ),
+                          )
                           .toList(),
                       selectedIndex: widget.selectedIndex,
                       onDestinationSelected: widget.onNavigate,
@@ -76,8 +80,10 @@ class _OrientedScaffoldState extends State<OrientedScaffold> {
               ? BottomNavigationBar(
                   items: widget.tabs
                       .map(
-                        (e) => BottomNavigationBarItem(
-                            icon: e.icon, label: e.label),
+                        (final e) => BottomNavigationBarItem(
+                          icon: e.icon,
+                          label: e.label,
+                        ),
                       )
                       .toList(),
                   currentIndex: widget.selectedIndex,

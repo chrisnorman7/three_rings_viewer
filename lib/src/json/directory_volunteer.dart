@@ -13,23 +13,24 @@ part 'directory_volunteer.g.dart';
 @JsonSerializable()
 class DirectoryVolunteer {
   /// Create an instance.
-  const DirectoryVolunteer(
-      {required this.id,
-      required this.orgId,
-      required this.url,
-      required this.name,
-      required this.isSupportPerson,
-      required this.account,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.creator,
-      required this.updater,
-      required this.roles,
-      required this.relationships,
-      required this.volunteerProperties});
+  const DirectoryVolunteer({
+    required this.id,
+    required this.orgId,
+    required this.url,
+    required this.name,
+    required this.isSupportPerson,
+    required this.account,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.creator,
+    required this.updater,
+    required this.roles,
+    required this.relationships,
+    required this.volunteerProperties,
+  });
 
   /// Create an instance from a JSON object.
-  factory DirectoryVolunteer.fromJson(Map<String, dynamic> json) =>
+  factory DirectoryVolunteer.fromJson(final Map<String, dynamic> json) =>
       _$DirectoryVolunteerFromJson(json);
 
   /// The ID of this volunteer.

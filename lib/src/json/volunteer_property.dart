@@ -9,11 +9,14 @@ part 'volunteer_property.g.dart';
 @JsonSerializable()
 class VolunteerProperty {
   /// Create an instance.
-  const VolunteerProperty(
-      {required this.id, required this.orgName, required this.value});
+  const VolunteerProperty({
+    required this.id,
+    required this.orgName,
+    required this.value,
+  });
 
   /// Create an instance from a JSON object.
-  factory VolunteerProperty.fromJson(Map<String, dynamic> json) =>
+  factory VolunteerProperty.fromJson(final Map<String, dynamic> json) =>
       _$VolunteerPropertyFromJson(json);
 
   /// The ID of this property.

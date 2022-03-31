@@ -10,27 +10,29 @@ part 'shift.g.dart';
 @JsonSerializable()
 class Shift {
   /// Create an instance.
-  const Shift(
-      {required this.id,
-      required this.title,
-      required this.start,
-      required this.seconds,
-      required this.minimumVolunteers,
-      required this.maximumVolunteers,
-      required this.closedAt,
-      required this.numVolunteersSatisfying,
-      required this.satisfied,
-      required this.numVolunteersFilling,
-      required this.full,
-      required this.allDay,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.points,
-      required this.rota,
-      required this.volunteerShifts});
+  const Shift({
+    required this.id,
+    required this.title,
+    required this.start,
+    required this.seconds,
+    required this.minimumVolunteers,
+    required this.maximumVolunteers,
+    required this.closedAt,
+    required this.numVolunteersSatisfying,
+    required this.satisfied,
+    required this.numVolunteersFilling,
+    required this.full,
+    required this.allDay,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.points,
+    required this.rota,
+    required this.volunteerShifts,
+  });
 
   /// Create an instance from a JSON object.
-  factory Shift.fromJson(Map<String, dynamic> json) => _$ShiftFromJson(json);
+  factory Shift.fromJson(final Map<String, dynamic> json) =>
+      _$ShiftFromJson(json);
 
   /// The ID of the shift.
   final int id;

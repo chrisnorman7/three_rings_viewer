@@ -9,11 +9,14 @@ part 'creator_volunteer.g.dart';
 @JsonSerializable()
 class CreatorVolunteer {
   /// Create an instance.
-  const CreatorVolunteer(
-      {required this.id, required this.name, required this.username});
+  const CreatorVolunteer({
+    required this.id,
+    required this.name,
+    required this.username,
+  });
 
   /// Create an instance from a JSON object.
-  factory CreatorVolunteer.fromJson(Map<String, dynamic> json) =>
+  factory CreatorVolunteer.fromJson(final Map<String, dynamic> json) =>
       _$CreatorVolunteerFromJson(json);
 
   /// The ID of this user.

@@ -12,7 +12,7 @@ class VolunteerList {
   const VolunteerList({required this.volunteers});
 
   /// Create an instance from a JSON object.
-  factory VolunteerList.fromJson(Map<String, dynamic> json) =>
+  factory VolunteerList.fromJson(final Map<String, dynamic> json) =>
       _$VolunteerListFromJson(json);
 
   /// The volunteers in this list.

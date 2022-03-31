@@ -9,11 +9,14 @@ part 'volunteer_role.g.dart';
 @JsonSerializable()
 class VolunteerRole {
   /// Create an instance.
-  const VolunteerRole(
-      {required this.id, required this.name, required this.suffix});
+  const VolunteerRole({
+    required this.id,
+    required this.name,
+    required this.suffix,
+  });
 
   /// Create an instance from a JSON object.
-  factory VolunteerRole.fromJson(Map<String, dynamic> json) =>
+  factory VolunteerRole.fromJson(final Map<String, dynamic> json) =>
       _$VolunteerRoleFromJson(json);
 
   /// The ID of this role.

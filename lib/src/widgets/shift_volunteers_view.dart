@@ -17,9 +17,11 @@ import 'volunteer_view.dart';
 /// A widget that shows the volunteers on shift.
 class ShiftVolunteersView extends StatefulWidget {
   /// Create an instance.
-  const ShiftVolunteersView(
-      {required this.shift, required this.preferences, Key? key})
-      : super(key: key);
+  const ShiftVolunteersView({
+    required this.shift,
+    required this.preferences,
+    final Key? key,
+  }) : super(key: key);
 
   /// The shift to show.
   final Shift shift;
@@ -29,14 +31,14 @@ class ShiftVolunteersView extends StatefulWidget {
 
   /// Create state for this widget.
   @override
-  _ShiftVolunteersViewState createState() => _ShiftVolunteersViewState();
+  ShiftVolunteersViewState createState() => ShiftVolunteersViewState();
 }
 
 /// State for [ShiftVolunteersView].
-class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
+class ShiftVolunteersViewState extends State<ShiftVolunteersView> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final volunteers = [
       for (final volunteerShift in widget.shift.volunteerShifts)
         volunteerShift.volunteer
@@ -50,7 +52,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
       child: Actions(
         actions: {
           HideUnhideShiftIntent: CallbackAction(
-            onInvoke: (intent) => hideUnhideShift(),
+            onInvoke: (final intent) => hideUnhideShift(),
           )
         },
         child: CancellableWidget(
@@ -59,8 +61,8 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
               title: Text(widget.shift.rota.name),
               actions: [
                 ElevatedButton(
-                  child: Text(ignored ? 'Unhide Shift' : 'Hide Shift'),
                   onPressed: hideUnhideShift,
+                  child: Text(ignored ? 'Unhide Shift' : 'Hide Shift'),
                 )
               ],
             ),
@@ -71,7 +73,7 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
                     ),
                   )
                 : ListView.builder(
-                    itemBuilder: (context, index) {
+                    itemBuilder: (final context, final index) {
                       final volunteer = volunteers[index];
                       return ListTile(
                         autofocus: index == 0,
@@ -93,30 +95,34 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
                           final future = http.get<JsonType>(
                             'https://www.3r.org.uk/directory/${volunteer.id}?format=json',
                           );
-                          Navigator.of(context).push(MaterialPageRoute<void>(
-                            builder: (context) => GetUrlWidget(
-                              future: future,
-                              onLoad: (json) {
-                                if (json == null) {
-                                  return Scaffold(
-                                    appBar: AppBar(
-                                      title: const Text('Error'),
-                                    ),
-                                    body: const Center(
-                                      child: Text('Failed to load volunteer.'),
-                                    ),
-                                  );
-                                } else {
-                                  final volunteer =
-                                      LoadedVolunteer.fromJson(json).volunteer;
-                                  return VolunteerView(
-                                    volunteer: volunteer,
-                                    apiKey: widget.preferences.apiKey!,
-                                  );
-                                }
-                              },
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (final context) => GetUrlWidget(
+                                future: future,
+                                onLoad: (final json) {
+                                  if (json == null) {
+                                    return Scaffold(
+                                      appBar: AppBar(
+                                        title: const Text('Error'),
+                                      ),
+                                      body: const Center(
+                                        child:
+                                            Text('Failed to load volunteer.'),
+                                      ),
+                                    );
+                                  } else {
+                                    final volunteer =
+                                        LoadedVolunteer.fromJson(json)
+                                            .volunteer;
+                                    return VolunteerView(
+                                      volunteer: volunteer,
+                                      apiKey: widget.preferences.apiKey!,
+                                    );
+                                  }
+                                },
+                              ),
                             ),
-                          ));
+                          );
                         },
                       );
                     },
@@ -131,16 +137,16 @@ class _ShiftVolunteersViewState extends State<ShiftVolunteersView> {
   /// Hide or unhide this shift.
   Future<void> hideUnhideShift() async {
     if (widget.preferences.ignoredRotas
-        .where((element) => element.id == widget.shift.rota.id)
+        .where((final element) => element.id == widget.shift.rota.id)
         .isNotEmpty) {
       widget.preferences.ignoredRotas.removeWhere(
-        (element) => element.id == widget.shift.rota.id,
+        (final element) => element.id == widget.shift.rota.id,
       );
     } else {
       widget.preferences.ignoredRotas.add(widget.shift.rota);
     }
     setState(() {});
     final preferences = await SharedPreferences.getInstance();
-    widget.preferences.save(preferences);
+    await widget.preferences.save(preferences);
   }
 }

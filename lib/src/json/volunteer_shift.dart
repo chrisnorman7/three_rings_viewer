@@ -9,16 +9,17 @@ part 'volunteer_shift.g.dart';
 @JsonSerializable()
 class VolunteerShift {
   /// Create an instance.
-  const VolunteerShift(
-      {required this.id,
-      required this.volunteer,
-      required this.confirmedAt,
-      required this.putForSwapAt,
-      required this.createdAt,
-      required this.updatedAt});
+  const VolunteerShift({
+    required this.id,
+    required this.volunteer,
+    required this.confirmedAt,
+    required this.putForSwapAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   /// Create an instance from a JSON object.
-  factory VolunteerShift.fromJson(Map<String, dynamic> json) =>
+  factory VolunteerShift.fromJson(final Map<String, dynamic> json) =>
       _$VolunteerShiftFromJson(json);
 
   /// The ID of this shift.

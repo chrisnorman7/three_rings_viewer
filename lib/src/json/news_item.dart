@@ -9,23 +9,24 @@ part 'news_item.g.dart';
 @JsonSerializable()
 class NewsItem {
   /// Create an instance.
-  const NewsItem(
-      {required this.id,
-      required this.title,
-      required this.body,
-      required this.url,
-      required this.orgId,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.archivedAt,
-      required this.expiresAt,
-      required this.sticky,
-      required this.priority,
-      required this.creator,
-      required this.updater});
+  const NewsItem({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.url,
+    required this.orgId,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.archivedAt,
+    required this.expiresAt,
+    required this.sticky,
+    required this.priority,
+    required this.creator,
+    required this.updater,
+  });
 
   /// Create an instance from a JSON object.
-  factory NewsItem.fromJson(Map<String, dynamic> json) =>
+  factory NewsItem.fromJson(final Map<String, dynamic> json) =>
       _$NewsItemFromJson(json);
 
   /// The ID of this item.

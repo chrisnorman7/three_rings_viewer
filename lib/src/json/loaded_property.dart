@@ -9,14 +9,15 @@ part 'loaded_property.g.dart';
 @JsonSerializable()
 class LoadedProperty {
   /// Create an instance.
-  const LoadedProperty(
-      {required this.id,
-      required this.code,
-      required this.name,
-      required this.value});
+  const LoadedProperty({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.value,
+  });
 
   /// Create an instance from a JSON object.
-  factory LoadedProperty.fromJson(Map<String, dynamic> json) =>
+  factory LoadedProperty.fromJson(final Map<String, dynamic> json) =>
       _$LoadedPropertyFromJson(json);
 
   /// The ID of this property.

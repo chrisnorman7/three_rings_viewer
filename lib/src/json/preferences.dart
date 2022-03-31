@@ -12,16 +12,17 @@ part 'preferences.g.dart';
 @JsonSerializable()
 class Preferences {
   /// Create an instance.
-  Preferences({this.apiKey, List<Rota>? ignoredRotas})
+  Preferences({this.apiKey, final List<Rota>? ignoredRotas})
       : ignoredRotas = ignoredRotas ?? [];
 
   /// Create an instance from a JSON object.
-  factory Preferences.fromJson(Map<String, dynamic> json) =>
+  factory Preferences.fromJson(final Map<String, dynamic> json) =>
       _$PreferencesFromJson(json);
 
   /// Load an instance from shared preferences.
   factory Preferences.fromSharedPreferences(
-      SharedPreferences sharedPreferences) {
+    final SharedPreferences sharedPreferences,
+  ) {
     final string = sharedPreferences.getString(_keyName);
     if (string == null) {
       return Preferences();
@@ -43,17 +44,19 @@ class Preferences {
   Map<String, dynamic> toJson() => _$PreferencesToJson(this);
 
   /// Save this instance.
-  Future<bool> save(SharedPreferences sharedPreferences) {
+  Future<bool> save(final SharedPreferences sharedPreferences) {
     final json = toJson();
     return sharedPreferences.setString(
-        _keyName, const JsonEncoder.withIndent('  ').convert(json));
+      _keyName,
+      const JsonEncoder.withIndent('  ').convert(json),
+    );
   }
 
   /// Returns `true` if the given [rota] should be hidden.
-  bool rotaHidden(Rota rota) =>
-      ignoredRotas.where((element) => element.id == rota.id).isNotEmpty;
+  bool rotaHidden(final Rota rota) =>
+      ignoredRotas.where((final element) => element.id == rota.id).isNotEmpty;
 
   /// Returns `true` if the given [rota] should not be hidden.
-  bool rotaUnhidden(Rota rota) =>
-      ignoredRotas.where((element) => element.id == rota.id).isEmpty;
+  bool rotaUnhidden(final Rota rota) =>
+      ignoredRotas.where((final element) => element.id == rota.id).isEmpty;
 }

@@ -12,7 +12,7 @@ class ShiftList {
   const ShiftList({required this.shifts});
 
   /// Create an instance from a JSON object.
-  factory ShiftList.fromJson(Map<String, dynamic> json) =>
+  factory ShiftList.fromJson(final Map<String, dynamic> json) =>
       _$ShiftListFromJson(json);
 
   /// The shifts in this list.

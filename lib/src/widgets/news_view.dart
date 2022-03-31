@@ -8,7 +8,7 @@ import 'news_item_view.dart';
 /// A widget to show a [NewsList] instance.
 class NewsView extends StatefulWidget {
   /// Create an instance.
-  const NewsView({required this.newsList, required this.apiKey, Key? key})
+  const NewsView({required this.newsList, required this.apiKey, final Key? key})
       : super(key: key);
 
   /// The news list to use.
@@ -19,20 +19,21 @@ class NewsView extends StatefulWidget {
 
   /// Create state for this widget.
   @override
-  _NewsViewState createState() => _NewsViewState();
+  NewsViewState createState() => NewsViewState();
 }
 
 /// State for [NewsView].
-class _NewsViewState extends State<NewsView> {
+class NewsViewState extends State<NewsView> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final newsItems = [
-      ...widget.newsList.newsItems.where((element) => element.sticky),
-      ...widget.newsList.newsItems.where((element) => element.sticky == false)
+      ...widget.newsList.newsItems.where((final element) => element.sticky),
+      ...widget.newsList.newsItems
+          .where((final element) => element.sticky == false)
     ];
     return ListView.builder(
-      itemBuilder: (context, index) {
+      itemBuilder: (final context, final index) {
         final newsItem = newsItems[index];
         final title = Text(
           newsItem.title + (newsItem.sticky ? ' (Sticky)' : ''),
@@ -46,16 +47,17 @@ class _NewsViewState extends State<NewsView> {
           ),
           title: newsItem.sticky
               ? Container(
-                  child: title,
                   decoration: const BoxDecoration(color: Colors.yellow),
+                  child: title,
                 )
               : title,
           subtitle: Text(prettyDate(newsItem.createdAt)),
-          onTap: () =>
-              Navigator.of(context).push(MaterialPageRoute<NewsItemView>(
-            builder: (context) =>
-                NewsItemView(newsItem: newsItem, apiKey: widget.apiKey),
-          )),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<NewsItemView>(
+              builder: (final context) =>
+                  NewsItemView(newsItem: newsItem, apiKey: widget.apiKey),
+            ),
+          ),
         );
       },
       itemCount: newsItems.length,

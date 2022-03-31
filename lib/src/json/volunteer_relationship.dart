@@ -9,14 +9,15 @@ part 'volunteer_relationship.g.dart';
 @JsonSerializable()
 class VolunteerRelationship {
   /// Create an instance.
-  const VolunteerRelationship(
-      {required this.id,
-      required this.volunteer1Id,
-      required this.volunteer2Id,
-      required this.orgRelationshipId});
+  const VolunteerRelationship({
+    required this.id,
+    required this.volunteer1Id,
+    required this.volunteer2Id,
+    required this.orgRelationshipId,
+  });
 
   /// Create an instance from a JSON object.
-  factory VolunteerRelationship.fromJson(Map<String, dynamic> json) =>
+  factory VolunteerRelationship.fromJson(final Map<String, dynamic> json) =>
       _$VolunteerRelationshipFromJson(json);
 
   /// The ID of this relationship.

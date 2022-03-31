@@ -12,7 +12,7 @@ class EventList {
   const EventList(this.events);
 
   /// Create an instance from a JSON object.
-  factory EventList.fromJson(Map<String, dynamic> json) =>
+  factory EventList.fromJson(final Map<String, dynamic> json) =>
       _$EventListFromJson(json);
 
   /// The events held by this object.

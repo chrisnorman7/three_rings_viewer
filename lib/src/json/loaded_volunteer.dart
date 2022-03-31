@@ -15,7 +15,7 @@ class LoadedVolunteer {
   const LoadedVolunteer(this.volunteer);
 
   /// Create an instance from a JSON object.
-  factory LoadedVolunteer.fromJson(Map<String, dynamic> json) {
+  factory LoadedVolunteer.fromJson(final Map<String, dynamic> json) {
     final value = <String, dynamic>{};
     for (final entry in (json['volunteer']! as Map<String, dynamic>).entries) {
       if (entry.key == 'volunteer_roles') {
@@ -30,9 +30,10 @@ class LoadedVolunteer {
           final loadedProperty =
               LoadedProperty.fromJson(propertyJson as JsonType);
           final property = VolunteerProperty(
-              id: loadedProperty.id,
-              orgName: loadedProperty.name,
-              value: loadedProperty.value);
+            id: loadedProperty.id,
+            orgName: loadedProperty.name,
+            value: loadedProperty.value,
+          );
           properties
               .add(<String, JsonType>{loadedProperty.code: property.toJson()});
         }

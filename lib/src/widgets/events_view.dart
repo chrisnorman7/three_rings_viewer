@@ -7,22 +7,22 @@ import '../util.dart';
 /// A widget for rendering and [EventList] instance.
 class EventsView extends StatefulWidget {
   /// Create an instance.
-  const EventsView({required this.eventList, Key? key}) : super(key: key);
+  const EventsView({required this.eventList, final Key? key}) : super(key: key);
 
   /// The vent list to render.
   final EventList eventList;
 
   /// Create state for this widget.
   @override
-  _EventsViewState createState() => _EventsViewState();
+  EventsViewState createState() => EventsViewState();
 }
 
 /// State for [EventsView].
-class _EventsViewState extends State<EventsView> {
+class EventsViewState extends State<EventsView> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) => ListView.builder(
-        itemBuilder: (context, index) {
+  Widget build(final BuildContext context) => ListView.builder(
+        itemBuilder: (final context, final index) {
           final event = widget.eventList.events[index];
           final isThreeLine = event.description.isNotEmpty;
           final date = event.date;

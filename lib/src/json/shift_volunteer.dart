@@ -10,7 +10,7 @@ class ShiftVolunteer {
   const ShiftVolunteer({required this.id, required this.name});
 
   /// Create an instance from a JSON object.
-  factory ShiftVolunteer.fromJson(Map<String, dynamic> json) =>
+  factory ShiftVolunteer.fromJson(final Map<String, dynamic> json) =>
       _$ShiftVolunteerFromJson(json);
 
   /// The ID of this volunteer.

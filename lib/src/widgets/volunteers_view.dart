@@ -7,9 +7,11 @@ import 'volunteer_view.dart';
 /// A widget to show a list of volunteers.
 class VolunteersView extends StatefulWidget {
   /// Create an instance.
-  const VolunteersView(
-      {required this.volunteers, required this.apiKey, Key? key})
-      : super(key: key);
+  const VolunteersView({
+    required this.volunteers,
+    required this.apiKey,
+    final Key? key,
+  }) : super(key: key);
 
   /// The volunteers to show.
   final List<DirectoryVolunteer> volunteers;
@@ -19,39 +21,34 @@ class VolunteersView extends StatefulWidget {
 
   /// Create state for this widget.
   @override
-  _VolunteersViewState createState() => _VolunteersViewState();
+  VolunteersViewState createState() => VolunteersViewState();
 }
 
 /// State for [VolunteersView].
-class _VolunteersViewState extends State<VolunteersView> {
+class VolunteersViewState extends State<VolunteersView> {
   /// Build a widget.
   @override
-  Widget build(BuildContext context) => OrientationBuilder(
-        builder: (context, orientation) => GridView.builder(
+  Widget build(final BuildContext context) => OrientationBuilder(
+        builder: (final context, final orientation) => GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: orientation == Orientation.portrait ? 4 : 5,
           ),
-          itemBuilder: (context, index) {
+          itemBuilder: (final context, final index) {
             final volunteer = widget.volunteers[index];
-            return IconButton(
+            return ListTile(
               autofocus: index == 0,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<VolunteerView>(
-                  builder: (context) => VolunteerView(
+              title: Image.network(
+                getImageUrl(volunteer.id),
+                headers: getHeaders(apiKey: widget.apiKey),
+              ),
+              subtitle: Text(volunteer.name),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (final context) => VolunteerView(
                     volunteer: volunteer,
                     apiKey: widget.apiKey,
                   ),
                 ),
-              ),
-              icon: Column(
-                children: [
-                  Image.network(
-                    getImageUrl(volunteer.id),
-                    headers: getHeaders(apiKey: widget.apiKey),
-                    semanticLabel: volunteer.name,
-                  ),
-                  Text(volunteer.name)
-                ],
               ),
             );
           },

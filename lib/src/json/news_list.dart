@@ -12,7 +12,7 @@ class NewsList {
   const NewsList(this.newsItems);
 
   /// Create an instance from a JSON object.
-  factory NewsList.fromJson(Map<String, dynamic> json) =>
+  factory NewsList.fromJson(final Map<String, dynamic> json) =>
       _$NewsListFromJson(json);
 
   /// The items this list contains.

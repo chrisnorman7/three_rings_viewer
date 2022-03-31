@@ -10,7 +10,8 @@ class Rota {
   const Rota({required this.id, required this.name});
 
   /// Create an instance from a JSON object.
-  factory Rota.fromJson(Map<String, dynamic> json) => _$RotaFromJson(json);
+  factory Rota.fromJson(final Map<String, dynamic> json) =>
+      _$RotaFromJson(json);
 
   /// The id of the rota.
   final int id;

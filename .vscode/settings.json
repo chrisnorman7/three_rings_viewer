@@ -3,6 +3,7 @@
     "analyzer",
     "APIKEY",
     "appbar",
+    "bools",
     "color",
     "Colors",
     "datetime",
@@ -10,7 +11,10 @@
     "formals",
     "img",
     "num",
+    "pubspec",
     "Schyler",
-    "Trajan"
+    "todos",
+    "Trajan",
+    "unawaited"
   ]
 }

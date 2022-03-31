@@ -8,11 +8,11 @@ void main() => runApp(const MyApp());
 /// The main app class.
 class MyApp extends StatelessWidget {
   /// Create an instance.
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({final Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) => MaterialApp(
+  Widget build(final BuildContext context) => MaterialApp(
         title: 'Three Rings Viewer',
         theme: ThemeData(
           // This is the theme of your application.
@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.green,
         ),
         initialRoute: HomePage.routeName,
-        routes: {
-          HomePage.routeName: (context) => const HomePage(),
-          ApiKeyForm.routeName: (context) => const ApiKeyForm()
+        routes: <String, WidgetBuilder>{
+          HomePage.routeName: (final context) => const HomePage(),
+          ApiKeyForm.routeName: (final context) => const ApiKeyForm()
         },
       );
 }

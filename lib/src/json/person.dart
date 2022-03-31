@@ -12,7 +12,8 @@ class Person {
   const Person({required this.id, required this.name, required this.username});
 
   /// Create an instance from a JSON object.
-  factory Person.fromJson(Map<String, dynamic> json) => _$PersonFromJson(json);
+  factory Person.fromJson(final Map<String, dynamic> json) =>
+      _$PersonFromJson(json);
 
   /// The ID of this creator.
   final int id;

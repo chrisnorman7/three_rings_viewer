@@ -12,7 +12,7 @@ class Account {
   const Account({required this.id, required this.username});
 
   /// Create an instance from a JSON object.
-  factory Account.fromJson(Map<String, dynamic> json) =>
+  factory Account.fromJson(final Map<String, dynamic> json) =>
       _$AccountFromJson(json);
 
   /// The ID of this account.

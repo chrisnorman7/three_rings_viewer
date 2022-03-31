@@ -10,18 +10,18 @@ import 'home_page.dart';
 /// A form for entering an API key.
 class ApiKeyForm extends StatefulWidget {
   /// Create an instance.
-  const ApiKeyForm({Key? key}) : super(key: key);
+  const ApiKeyForm({final Key? key}) : super(key: key);
 
   /// The route name.
   static const routeName = '/api_key';
 
   /// Create state for this widget.
   @override
-  _ApiKeyFormState createState() => _ApiKeyFormState();
+  ApiKeyFormState createState() => ApiKeyFormState();
 }
 
 /// State for [ApiKeyForm].
-class _ApiKeyFormState extends State<ApiKeyForm> {
+class ApiKeyFormState extends State<ApiKeyForm> {
   /// The form key.
   late final GlobalKey<FormState> _formKey;
 
@@ -45,7 +45,7 @@ class _ApiKeyFormState extends State<ApiKeyForm> {
 
   /// Build a widget.
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final preferences =
         ModalRoute.of(context)!.settings.arguments as Preferences;
     _apiKeyController.text = preferences.apiKey ?? '';
@@ -56,7 +56,7 @@ class _ApiKeyFormState extends State<ApiKeyForm> {
       child: Actions(
         actions: {
           CancelIntent: CallbackAction(
-            onInvoke: (intent) => cancel(),
+            onInvoke: (final intent) => cancel(),
           )
         },
         child: Scaffold(
@@ -73,10 +73,14 @@ class _ApiKeyFormState extends State<ApiKeyForm> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     preferences.apiKey = _apiKeyController.text;
-                    await preferences
-                        .save(await SharedPreferences.getInstance());
-                    Navigator.of(context)
-                        .pushReplacementNamed(HomePage.routeName);
+                    await preferences.save(
+                      await SharedPreferences.getInstance(),
+                    );
+                    if (mounted) {
+                      await Navigator.of(context).pushReplacementNamed(
+                        HomePage.routeName,
+                      );
+                    }
                   }
                 },
                 tooltip: 'Save',
